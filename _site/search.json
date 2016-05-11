@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "Android的IPC机制（一）——AIDL的使用",
+      "category" : "",
+      "tags"     : "sample post",
+      "url"      : "http://localhost:4000/android/android-ipc1-aidl/",
+      "date"     : "2016-02-20 00:00:00 -0500"
+    } ,
+  
+    {
       "title"    : "Sample Post with Feature Image",
       "category" : "",
       "tags"     : "sample post",

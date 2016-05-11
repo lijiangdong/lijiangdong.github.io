@@ -4,13 +4,765 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="http://localhost:4000/feed.xml" />
 <link rel="alternate" type="text/html" href="http://localhost:4000" />
-<updated>2016-05-11T10:40:46-04:00</updated>
+<updated>2016-05-11T10:51:34-04:00</updated>
 <id>http://localhost:4000/</id>
 <author>
   <name>Your name</name>
   <uri>http://localhost:4000/</uri>
   <email>you@email.com</email>
 </author>
+
+
+<entry>
+  <title type="html"><![CDATA[Android的IPC机制（一）——AIDL的使用]]></title>
+ <link rel="alternate" type="text/html" href="http://localhost:4000/android/android-ipc1-aidl/" />
+  <id>http://localhost:4000/android/android-ipc1-aidl</id>
+  <updated>2014-12-24T00:00:00-00:00</updated>
+  <published>2016-02-20T00:00:00-05:00</published>
+  
+  <author>
+    <name>Your name</name>
+    <uri>http://localhost:4000</uri>
+    <email>you@email.com</email>
+  </author>
+  <content type="html">
+    &lt;h1 id=&quot;section&quot;&gt;&lt;strong&gt;综述&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;　　IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。
+　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。
+#&lt;strong&gt;AIDL简介&lt;/strong&gt;
+　　AIDL是 Android Interface Definition Language的缩写。AIDL 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行 IPC的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。
+　　AIDL IPC机制是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。
+#&lt;strong&gt;AIDL用法&lt;/strong&gt;
+　　首先我们创建一个AIDL文件，在AndroidStudio中当我们创建一个AIDL文件时会自动为我们创件一个AILD文件夹，用于存放AIDL文件。创建完之后重新rebuild会自动生成aidl实现类。
+　　&lt;img src=&quot;http://img.blog.csdn.net/20160220165323807&quot; alt=&quot;这里写图片描述&quot; /&gt;
+　　在下面的例子当中，我们将Service单独作为一个应用在系统中运行，在另一个用于访问Service的client也单独作为一个应用运行在系统中。这样保证了两个程序分别运行在两个进程中。并且使用了&lt;a href=&quot;https://github.com/JakeWharton/butterknife&quot;&gt;butterknife&lt;/a&gt;进行控件绑定。
+##&lt;strong&gt;AIDL简单用法&lt;/strong&gt;
+###&lt;strong&gt;演示&lt;/strong&gt;
+　　在Service中我们对客户端传来的两个整数做了一次加法运算并返回到客户端中。
+&lt;img src=&quot;http://img.blog.csdn.net/20160220151918200&quot; alt=&quot;这里写图片描述&quot; /&gt;
+　　
+###&lt;strong&gt;AIDL代码&lt;/strong&gt;
+```
+// ICalculate.aidl
+package com.ljd.aidl;&lt;/p&gt;
+
+&lt;p&gt;// Declare any non-default types here with import statements&lt;/p&gt;
+
+&lt;p&gt;interface ICalculate {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+    int add(int first, int second);
+}
+```&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;&lt;strong&gt;服务端代码&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;```
+package com.ljd.aidl.service;&lt;/p&gt;
+
+&lt;p&gt;import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.RemoteException;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.ICalculate;&lt;/p&gt;
+
+&lt;p&gt;public class CalculateService extends Service {
+    public CalculateService() {
+    }&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private Binder mBinder = new ICalculate.Stub(){
+
+    @Override
+    public int add(int first, int second) throws RemoteException {
+        return first + second;
+    }
+};
+
+@Override
+public IBinder onBind(Intent intent) {
+    return mBinder;
+} } ``` ###**客户端代码** ``` package com.ljd.aidl.activity;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.ICalculate;
+import com.ljd.aidl.client.R;&lt;/p&gt;
+
+&lt;p&gt;import butterknife.ButterKnife;
+import butterknife.OnClick;&lt;/p&gt;
+
+&lt;p&gt;public class Demo1Activity extends AppCompatActivity {&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private final String TAG = &quot;DEMO1&quot;;
+//是否已经绑定service
+private boolean mIsBindService;
+private ICalculate mCalculate;
+private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        Log.d(TAG,&quot;bind success&quot;);
+        Toast.makeText(Demo1Activity.this,&quot;bind service success&quot;,Toast.LENGTH_SHORT).show();
+        mCalculate = ICalculate.Stub.asInterface(service);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+    //重新绑定Service防止系统将服务进程杀死而产生的调用错误。
+        bindService();
+    }
+};
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_demo1);
+    ButterKnife.bind(this);
+    mIsBindService = false;
+}
+
+@Override
+protected void onDestroy() {
+    unbindService();
+    ButterKnife.unbind(this);
+    super.onDestroy();
+}
+
+@OnClick({ R.id.bind_demo1_btn,R.id.unbind_demo1_btn,R.id.calculate_btn})
+public void onClickButton(View v) {
+    switch (v.getId()){
+        case R.id.bind_demo1_btn:
+            bindService();
+            break;
+        case R.id.unbind_demo1_btn:
+            Toast.makeText(this,&quot;unbind service success&quot;,Toast.LENGTH_SHORT).show();
+            unbindService();
+            break;
+        case R.id.calculate_btn:
+            if (mIsBindService &amp;amp;&amp;amp; mCalculate != null ){
+                try {
+                    int result = mCalculate.add(2,4);
+                    Log.d(TAG,String.valueOf(result));
+                    Toast.makeText(this,String.valueOf(result),Toast.LENGTH_SHORT).show();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(this,&quot;not bind service&quot;,Toast.LENGTH_SHORT).show();
+            }
+            break;
+    }
+}
+
+private void bindService(){
+    Intent intent = new Intent();
+    intent.setAction(&quot;com.ljd.aidl.action.CALCULATE_SERVICE&quot;);
+    bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
+    mIsBindService = true;
+}
+
+private void unbindService(){
+    if(mIsBindService){
+        mIsBindService = false;
+        unbindService(mConnection);
+    }
+} } ``` ##**AIDL高级用法** 　　对于上面的例子，在AIDL接口中只是使用了一些Java的基本类型，对于AIDL文件并不是所有的类型都是可用的，那么在AIDL中究竟有哪些类型可以使用呢？ ###**AIDL语法规则** 默认情况下AIDL支持以下数据类型：
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;所有Java的基本数据类型（例如： int, long,double, char, boolean等）&lt;/li&gt;
+  &lt;li&gt;String和CharSequence&lt;/li&gt;
+  &lt;li&gt;List：AIDL实际接收到的是ArrayList，并且List里面所有元素都必须被AIDL支持&lt;/li&gt;
+  &lt;li&gt;Map: AIDL实际接收到的是HashMap，并且Map里面所有元素都必须被AIDL支持&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果不是上面所述类型，我们必须要显示import进来，即使他们在同一个包中。当我们使用自定义的对象时必须实现Parcelable接口，Parcelable为对象序列化接口，效率比实现Serializable接口高。并且新建一个与该类同名的AIDL文件，声明他为Parcelable类型。&lt;/p&gt;
+
+&lt;p&gt;我们定义AIDL接口还需要注意以下几点：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;方法可以有多个或没有参数，可以有返回值也可以为void&lt;/li&gt;
+  &lt;li&gt;在参数中，除了基本类型以外，我们必须为参数标上方向in, out, 或者 inout&lt;/li&gt;
+  &lt;li&gt;在AIDL文件中只支持方法，不支持静态常量
+###&lt;strong&gt;演示&lt;/strong&gt;
+　　在计算机商店中需要采购笔记本进行销售，在服务端中我们添加两台笔记本，在客户端中我们为商店加购一台dell笔记本。
+&lt;img src=&quot;http://img.blog.csdn.net/20160220151944872&quot; alt=&quot;这里写图片描述&quot; /&gt;
+　　
+###&lt;strong&gt;实体类代码&lt;/strong&gt;###
+　　我们首先构建一个计算机实体类，包含笔记本的id，品牌，型号，并且实现Parcelable接口，在AndroidStudio中会为我们自动构造代码。
+　　
+```
+package com.ljd.aidl.entity;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;import android.os.Parcel;
+import android.os.Parcelable;&lt;/p&gt;
+
+&lt;p&gt;public class ComputerEntity implements Parcelable{&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public int computerId;     //id
+public String brand;       //品牌
+public String model;       //型号
+
+public ComputerEntity(int computerId, String brand, String model) {
+    this.brand = brand;
+    this.computerId = computerId;
+    this.model = model;
+}
+
+protected ComputerEntity(Parcel in) {
+    computerId = in.readInt();
+    brand = in.readString();
+    model = in.readString();
+}
+
+public static final Creator&amp;lt;ComputerEntity&amp;gt; CREATOR = new Creator&amp;lt;ComputerEntity&amp;gt;() {
+    @Override
+    public ComputerEntity createFromParcel(Parcel in) {
+        return new ComputerEntity(in);
+    }
+
+    @Override
+    public ComputerEntity[] newArray(int size) {
+        return new ComputerEntity[size];
+    }
+};
+
+@Override
+public int describeContents() {
+    return 0;
+}
+
+@Override
+public void writeToParcel(Parcel dest, int flags) {
+    dest.writeInt(computerId);
+    dest.writeString(brand);
+    dest.writeString(model);
+} } ``` ###**AIDL代码** 　　在AIDL中对实体类进行声明，包名和文件名必须与实体类一致。在AndroidStudio中新建一个与实体类同名的AIDL文件会报错，需要先用一个其它名字，然后修改与实体类名一致即可。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;```
+package com.ljd.aidl.entity;&lt;/p&gt;
+
+&lt;p&gt;//包名必须和对用实体类的包名一致
+// Declare any non-default types here with import statements
+parcelable ComputerEntity;
+```
+　　添加两个接口分别为添加一台笔记本和获取全部笔记本，在该文件中使用到了ComputerEntity类，显示的import进来。&lt;/p&gt;
+
+&lt;p&gt;```
+package com.ljd.aidl;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.entity.ComputerEntity;
+// Declare any non-default types here with import statements&lt;/p&gt;
+
+&lt;p&gt;interface IComputerManager {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+     void addComputer(in ComputerEntity computer);
+     List&lt;ComputerEntity&gt; getComputerList();
+}
+```&lt;/ComputerEntity&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;&lt;strong&gt;服务端代码&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;```
+package com.ljd.aidl.service;&lt;/p&gt;
+
+&lt;p&gt;import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.RemoteException;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.IComputerManager;
+import com.ljd.aidl.entity.ComputerEntity;&lt;/p&gt;
+
+&lt;p&gt;import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;&lt;/p&gt;
+
+&lt;p&gt;public class ComputerService extends Service {
+    private CopyOnWriteArrayList&lt;ComputerEntity&gt; mComputerList = new CopyOnWriteArrayList&amp;lt;&amp;gt;();&lt;/ComputerEntity&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public ComputerService() {
+}
+
+private final IComputerManager.Stub mBinder = new IComputerManager.Stub() {
+    @Override
+    public void addComputer(ComputerEntity computer) throws RemoteException {
+        mComputerList.add(computer);
+    }
+
+    @Override
+    public List&amp;lt;ComputerEntity&amp;gt; getComputerList() throws RemoteException {
+        return mComputerList;
+    }
+};
+
+@Override
+public void onCreate() {
+    super.onCreate();
+    mComputerList.add(new ComputerEntity(0,&quot;apple&quot;,&quot;macbookpro&quot;));
+    mComputerList.add(new ComputerEntity(1,&quot;microsoft&quot;,&quot;surfacebook&quot;));
+    mComputerList.add(new ComputerEntity(2,&quot;dell&quot;,&quot;XPS13&quot;));
+}
+
+@Override
+public IBinder onBind(Intent intent) {
+    return mBinder;
+} } ``` 　　注意：在该类中使用了CopyOnWriteArrayList，CopyOnWriteArrayList能够自动进行线程同步。可是在AIDL中接收和返回的只能是ArrayList，其实AIDL支持的是抽象的List，在Binder中会按照List访问数据并最终形成一个ArrayList，所以在AIDL中返回的还是一个ArrayList。 ###**客户端代码**
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;```
+package com.ljd.aidl.activity;&lt;/p&gt;
+
+&lt;p&gt;import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.IComputerManager;
+import com.ljd.aidl.client.R;
+import com.ljd.aidl.entity.ComputerEntity;&lt;/p&gt;
+
+&lt;p&gt;import java.util.List;&lt;/p&gt;
+
+&lt;p&gt;import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;&lt;/p&gt;
+
+&lt;p&gt;public class Demo2Activity extends AppCompatActivity{&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@Bind(R.id.show_linear)
+LinearLayout mShowLinear;
+
+private boolean mIsBindService;
+private IComputerManager mRemoteComputerManager;
+private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
+    @Override
+    public void binderDied() {
+        if(mRemoteComputerManager != null){
+            mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,0);
+            mRemoteComputerManager = null;
+            bindService();
+        }
+    }
+};
+private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mIsBindService = true;
+        Toast.makeText(Demo2Activity.this,&quot;bind service success&quot;,Toast.LENGTH_SHORT).show();
+        mRemoteComputerManager = IComputerManager.Stub.asInterface(service);
+        try {
+            mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,0);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        mRemoteComputerManager = null;
+    }
+};
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_demo2);
+    ButterKnife.bind(this);
+    mIsBindService = false;
+}
+
+@Override
+protected void onDestroy() {
+    unbindService();
+    ButterKnife.unbind(this);
+    super.onDestroy();
+}
+
+@OnClick({R.id.bind_demo2_btn,R.id.unbind_demo2_btn,R.id.test_demo2_btn,R.id.clear_demo2_btn})
+public void onClickButton(View v) {
+    switch (v.getId()){
+        case R.id.bind_demo2_btn:
+            bindService();
+            break;
+        case R.id.unbind_demo2_btn:
+            Toast.makeText(this,&quot;unbind service success&quot;,Toast.LENGTH_SHORT).show();
+            unbindService();
+            break;
+        case R.id.test_demo2_btn:
+            if (!mIsBindService || mRemoteComputerManager == null){
+                Toast.makeText(this,&quot;not bind service&quot;,Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                List&amp;lt;ComputerEntity&amp;gt; computerList = mRemoteComputerManager.getComputerList();
+                for (int i =0;i&amp;lt;computerList.size();i++){
+                    String str = &quot;computerId:&quot; + String.valueOf(computerList.get(i).computerId) +
+                            &quot; brand:&quot; + computerList.get(i).brand +
+                            &quot; model:&quot; + computerList.get(i).model ;
+                    TextView textView = new TextView(this);
+                    textView.setText(str);
+                    mShowLinear.addView(textView);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            break;
+        case R.id.clear_demo2_btn:
+            mShowLinear.removeAllViews();
+            break;
+    }
+}
+
+private void bindService(){
+    Intent intent = new Intent();
+    intent.setAction(&quot;com.ljd.aidl.action.COMPUTER_SERVICE&quot;);
+    mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
+}
+
+private void unbindService(){
+    if(!mIsBindService){
+        return;
+    }
+    mIsBindService = false;
+    unbindService(mConnection);
+} } ``` 　　由于Binder是有可能会意外死亡的，也就是Service所在进程被系统杀死，这时候我们调用Service的方法就会失败。在第一个例子中我们通过onServiceDisconnected方法中重新绑定服务。在这个例子中我们采用了另外一种方法，由于在Binder中提供了两个配对的方法linkToDeath和unlinkToDeath，通过linkToDeath可以给Binder设置一个死亡代理，Binder死亡时回调binderDied方法，在binderDied方法中我们重新绑定服务即可。 ##**AIDL用法拓展** 　　当我们需要一种笔记本的时候，由于商店缺货，这时候我们会给卖家说一声，我所需要的这款笔记本到货后通知我。也就成了所谓的观察者模式。 　　在Android系统中为我们提供了一个RemoteCallbackList,RemoteCallbackList是系统专门用来删除跨进程的listener接口，并且在RemoteCallbackList中自动实现了线程同步功能，下面看一下它的用法。 ###**演示** 　　客户端注册服务以后，服务端每隔三秒会添加一台笔记本，并通知给客户端显示。 ![这里写图片描述](http://img.blog.csdn.net/20160220152001794) ###**AIDL代码** 　　到货后的AIDL监听接口 　　 ``` package com.ljd.aidl;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;import com.ljd.aidl.entity.ComputerEntity;
+// Declare any non-default types here with import statements&lt;/p&gt;
+
+&lt;p&gt;interface IOnComputerArrivedListener {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+    void onComputerArrived(in ComputerEntity computer);
+}
+```&lt;/p&gt;
+
+&lt;p&gt;　　在IComputerManager接口中添加两个方法。显示importIOnComputerArrivedListener ,即使在同一个包下面。
+　　
+```
+// IComputerManagerObserver.aidl
+package com.ljd.aidl;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.entity.ComputerEntity;
+import com.ljd.aidl.IOnComputerArrivedListener;
+// Declare any non-default types here with import statements&lt;/p&gt;
+
+&lt;p&gt;interface IComputerManagerObserver {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+     void addComputer(in ComputerEntity computer);
+     List&lt;ComputerEntity&gt; getComputerList();
+     void registerUser(IOnComputerArrivedListener listener);
+     void unRegisterUser(IOnComputerArrivedListener listener);
+}&lt;/ComputerEntity&gt;&lt;/p&gt;
+
+&lt;p&gt;```&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;&lt;strong&gt;服务端代码&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;```
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.RemoteCallbackList;
+import android.os.RemoteException;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.IComputerManagerObserver;
+import com.ljd.aidl.IOnComputerArrivedListener;
+import com.ljd.aidl.entity.ComputerEntity;&lt;/p&gt;
+
+&lt;p&gt;import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;&lt;/p&gt;
+
+&lt;p&gt;public class ComputerObserverService extends Service{
+    public ComputerObserverService() {
+    }&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private CopyOnWriteArrayList&amp;lt;ComputerEntity&amp;gt; mComputerList = new CopyOnWriteArrayList&amp;lt;&amp;gt;();
+private RemoteCallbackList&amp;lt;IOnComputerArrivedListener&amp;gt; mComputerArrivedListenerList = new RemoteCallbackList&amp;lt;&amp;gt;();
+private AtomicBoolean mIsServiceDestroy = new AtomicBoolean(false);
+
+private Binder mBinder = new IComputerManagerObserver.Stub(){
+
+    @Override
+    public void addComputer(ComputerEntity computer) throws RemoteException {
+        mComputerList.add(computer);
+    }
+
+    @Override
+    public List&amp;lt;ComputerEntity&amp;gt; getComputerList() throws RemoteException {
+        return mComputerList;
+    }
+
+    @Override
+    public void registerUser(IOnComputerArrivedListener listener) throws RemoteException {
+        mComputerArrivedListenerList.register(listener);
+    }
+
+    @Override
+    public void unRegisterUser(IOnComputerArrivedListener listener) throws RemoteException {
+        mComputerArrivedListenerList.unregister(listener);
+    }
+};
+
+@Override
+public void onCreate() {
+    super.onCreate();
+    mComputerList.add(new ComputerEntity(0,&quot;apple&quot;,&quot;macbookpro&quot;));
+    mComputerList.add(new ComputerEntity(1,&quot;microsoft&quot;,&quot;surfacebook&quot;));
+    mComputerList.add(new ComputerEntity(2,&quot;dell&quot;,&quot;XPS13&quot;));
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while (!mIsServiceDestroy.get()){
+                try {
+                    Thread.currentThread().sleep(3000);
+                    ComputerEntity computer = new ComputerEntity(mComputerList.size(),&quot;******&quot;,&quot;******&quot;);
+                    mComputerList.add(computer);
+                    final int COUNT = mComputerArrivedListenerList.beginBroadcast();
+                    //通知所有注册过的用户
+                    for (int i=0;i&amp;lt;COUNT;i++){
+                        IOnComputerArrivedListener listener = mComputerArrivedListenerList.getBroadcastItem(i);
+                        if (listener != null){
+                            listener.onComputerArrived(computer);
+                        }
+                    }
+                    mComputerArrivedListenerList.finishBroadcast();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }).start();
+}
+
+@Override
+public IBinder onBind(Intent intent) {
+    return mBinder;
+}
+
+@Override
+public void onDestroy() {
+    super.onDestroy();
+    mIsServiceDestroy.set(true);
+} } ``` 　　注意：RemoteCallbackList并不是一个List，所以我们不能像操作List一样操作RemoteCallbackList。并且遍历RemoteCallbackList时，beginBroadcast和finishBroadcast是配对使用的。 ###**客户端代码** ```
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;&lt;/p&gt;
+
+&lt;p&gt;import com.ljd.aidl.IComputerManagerObserver;
+import com.ljd.aidl.IOnComputerArrivedListener;
+import com.ljd.aidl.client.R;
+import com.ljd.aidl.entity.ComputerEntity;&lt;/p&gt;
+
+&lt;p&gt;import java.util.List;&lt;/p&gt;
+
+&lt;p&gt;import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;&lt;/p&gt;
+
+&lt;p&gt;public class Demo3Activity extends AppCompatActivity {&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@Bind(R.id.show_demo3_linear)
+LinearLayout mShowLinear;
+
+private boolean mIsBindService;
+private static final int MESSAGE_COMPUTER_ARRIVED = 1;
+
+private IComputerManagerObserver mRemoteComputerManager;
+private Handler mHandler = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what){
+            case MESSAGE_COMPUTER_ARRIVED:
+                ComputerEntity computer = (ComputerEntity)msg.obj;
+                String str = &quot;computerId:&quot; + String.valueOf(computer.computerId) +
+                        &quot; brand:&quot; + computer.brand +
+                        &quot; model:&quot; + computer.model ;
+                TextView textView = new TextView(Demo3Activity.this);
+                textView.setText(str);
+                mShowLinear.addView(textView);
+                break;
+            default:
+                super.handleMessage(msg);
+                break;
+        }
+
+    }
+};
+
+private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
+    @Override
+    public void binderDied() {
+        if(mRemoteComputerManager != null){
+            mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,0);
+            mRemoteComputerManager = null;
+            bindService();
+        }
+    }
+};
+
+private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mIsBindService = true;
+        Toast.makeText(Demo3Activity.this,&quot;bind service success&quot;,Toast.LENGTH_SHORT).show();
+        mRemoteComputerManager = IComputerManagerObserver.Stub.asInterface(service);
+        try {
+            mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,0);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        mRemoteComputerManager = null;
+    }
+};
+
+private IOnComputerArrivedListener mOnComputerArrivedListener = new IOnComputerArrivedListener.Stub(){
+
+    @Override
+    public void onComputerArrived(ComputerEntity computer) throws RemoteException {
+        mHandler.obtainMessage(MESSAGE_COMPUTER_ARRIVED,computer).sendToTarget();
+    }
+};
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_demo3);
+    ButterKnife.bind(this);
+    mIsBindService = false;
+}
+
+@Override
+protected void onDestroy() {
+    unbindService();
+    ButterKnife.unbind(this);
+    super.onDestroy();
+}
+
+@OnClick({R.id.bind_demo3_btn,R.id.unbind_demo3_btn,R.id.test_demo3_btn,R.id.clear_demo3_btn})
+public void onClickButton(View v){
+    switch (v.getId()){
+        case R.id.bind_demo3_btn:
+            bindService();
+            break;
+        case R.id.unbind_demo3_btn:
+            Toast.makeText(this,&quot;unbind service success&quot;,Toast.LENGTH_SHORT).show();
+            unbindService();
+            break;
+        case R.id.test_demo3_btn:
+            if (!mIsBindService || mRemoteComputerManager == null){
+                Toast.makeText(this,&quot;not bind service&quot;,Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                ComputerEntity computer = new ComputerEntity(3,&quot;hp&quot;,&quot;envy13&quot;);
+                mRemoteComputerManager.addComputer(computer);
+                List&amp;lt;ComputerEntity&amp;gt; computerList = mRemoteComputerManager.getComputerList();
+                for (int i =0;i&amp;lt;computerList.size();i++){
+                    String str = &quot;computerId:&quot; + String.valueOf(computerList.get(i).computerId) +
+                            &quot; brand:&quot; + computerList.get(i).brand +
+                            &quot; model:&quot; + computerList.get(i).model ;
+                    TextView textView = new TextView(this);
+                    textView.setText(str);
+                    mShowLinear.addView(textView);
+                }
+                mRemoteComputerManager.registerUser(mOnComputerArrivedListener);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            break;
+        case R.id.clear_demo3_btn:
+            mShowLinear.removeAllViews();
+            break;
+    }
+}
+
+private void bindService(){
+    Intent intent = new Intent();
+    intent.setAction(&quot;com.ljd.aidl.action.COMPUTER_OBSERVER_SERVICE&quot;);
+    mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
+}
+
+private void unbindService(){
+    if(!mIsBindService){
+        return;
+    }
+    if (mRemoteComputerManager != null &amp;amp;&amp;amp; mRemoteComputerManager.asBinder().isBinderAlive()){
+        try {
+            mRemoteComputerManager.unRegisterUser(mOnComputerArrivedListener);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    unbindService(mConnection);
+    mIsBindService = false;
+} } ``` #**[源码下载](https://github.com/lijiangdong/aidl.git)**
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+    &lt;p&gt;&lt;a href=&quot;http://localhost:4000/android/android-ipc1-aidl/&quot;&gt;Android的IPC机制（一）——AIDL的使用&lt;/a&gt; was originally published by Your name at &lt;a href=&quot;http://localhost:4000&quot;&gt;李江东&lt;/a&gt; on February 20, 2016.&lt;/p&gt;
+  </content>
+</entry>
 
 
 <entry>
