@@ -1,764 +1,229 @@
 ---
 layout: post
-title: Android的IPC机制（一）——AIDL的使用
-description: "IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信..."
+title: Sample Post
+description: "Just about everything you'll need to style in the theme: headings, paragraphs, blockquotes, tables, code blocks, and more."
 modified: 2014-12-24
 tags: [sample post]
-categories: [Android]
+categories: [intro]
 ---
+# Android中的事件分发机制--ViewGroup的事件分发
 #**综述**
-　　IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。
-　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。
-#**AIDL简介**
-　　AIDL是 Android Interface Definition Language的缩写。AIDL 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行 IPC的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。
-　　AIDL IPC机制是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。
-#**AIDL用法**
-　　首先我们创建一个AIDL文件，在AndroidStudio中当我们创建一个AIDL文件时会自动为我们创件一个AILD文件夹，用于存放AIDL文件。创建完之后重新rebuild会自动生成aidl实现类。
-　　![这里写图片描述](http://img.blog.csdn.net/20160220165323807)
-　　在下面的例子当中，我们将Service单独作为一个应用在系统中运行，在另一个用于访问Service的client也单独作为一个应用运行在系统中。这样保证了两个程序分别运行在两个进程中。并且使用了[butterknife](https://github.com/JakeWharton/butterknife)进行控件绑定。
-##**AIDL简单用法**
-###**演示**
-　　在Service中我们对客户端传来的两个整数做了一次加法运算并返回到客户端中。
-![这里写图片描述](http://img.blog.csdn.net/20160220151918200)
+　　Android中的事件分发机制也就是View与ViewGroup的对事件的分发与处理。在ViewGroup的内部包含了许多View，而ViewGroup继承自View，所以ViewGroup本身也是一个View。对于事件可以通过ViewGroup下发到它的子View并交由子View进行处理，而ViewGroup本身也能够对事件做出处理。下面就来详细分析一下ViewGroup对时间的分发处理。
+#**MotionEvent**
+　　当手指接触到屏幕以后，所产生的一系列的事件中，都是由以下三种事件类型组成。
+　　1. **ACTION_DOWN:** 手指按下屏幕
+　　2. **ACTION_MOVE:** 手指在屏幕上移动
+　　3. **ACTION_UP:** 手指从屏幕上抬起
+　　例如一个简单的屏幕触摸动作触发了一系列Touch事件:ACTION_DOWN->ACTION_MOVE->...->ACTION_MOVE->ACTION_UP
+　　对于Android中的这个事件分发机制，其中的这个事件指的就是MotionEvent。而View的对事件的分发也是对MotionEvent的分发操作。可以通过getRawX和getRawY来获取事件相对于屏幕左上角的横纵坐标。通过getX()和getY()来获取事件相对于当前View左上角的横纵坐标。
+#**三个重要方法**
+**public boolean dispatchTouchEvent(MotionEvent ev)**
+
+　　这是一个对事件分发的方法。如果一个事件传递给了当前的View，那么当前View一定会调用该方法。对于dispatchTouchEvent的返回类型是boolean类型的，返回结果表示是否消耗了这个事件，如果返回的是true，就表明了这个View已经被消耗，不会再继续向下传递。　　
 　　
-###**AIDL代码**
-```
-// ICalculate.aidl
-package com.ljd.aidl;
+**public boolean onInterceptTouchEvent(MotionEvent ev)**
 
-// Declare any non-default types here with import statements
-
-interface ICalculate {
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-    int add(int first, int second);
-}
-```
-
-###**服务端代码**
-```
-package com.ljd.aidl.service;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.os.RemoteException;
-
-import com.ljd.aidl.ICalculate;
-
-public class CalculateService extends Service {
-    public CalculateService() {
-    }
-
-    private Binder mBinder = new ICalculate.Stub(){
-
-        @Override
-        public int add(int first, int second) throws RemoteException {
-            return first + second;
-        }
-    };
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-}
-```
-###**客户端代码**
-```
-package com.ljd.aidl.activity;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
-
-import com.ljd.aidl.ICalculate;
-import com.ljd.aidl.client.R;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-public class Demo1Activity extends AppCompatActivity {
-
-    private final String TAG = "DEMO1";
-    //是否已经绑定service
-    private boolean mIsBindService;
-    private ICalculate mCalculate;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG,"bind success");
-            Toast.makeText(Demo1Activity.this,"bind service success",Toast.LENGTH_SHORT).show();
-            mCalculate = ICalculate.Stub.asInterface(service);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        //重新绑定Service防止系统将服务进程杀死而产生的调用错误。
-            bindService();
-        }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_demo1);
-        ButterKnife.bind(this);
-        mIsBindService = false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        unbindService();
-        ButterKnife.unbind(this);
-        super.onDestroy();
-    }
-
-    @OnClick({ R.id.bind_demo1_btn,R.id.unbind_demo1_btn,R.id.calculate_btn})
-    public void onClickButton(View v) {
-        switch (v.getId()){
-            case R.id.bind_demo1_btn:
-                bindService();
-                break;
-            case R.id.unbind_demo1_btn:
-                Toast.makeText(this,"unbind service success",Toast.LENGTH_SHORT).show();
-                unbindService();
-                break;
-            case R.id.calculate_btn:
-                if (mIsBindService && mCalculate != null ){
-                    try {
-                        int result = mCalculate.add(2,4);
-                        Log.d(TAG,String.valueOf(result));
-                        Toast.makeText(this,String.valueOf(result),Toast.LENGTH_SHORT).show();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(this,"not bind service",Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }
-
-    private void bindService(){
-        Intent intent = new Intent();
-        intent.setAction("com.ljd.aidl.action.CALCULATE_SERVICE");
-        bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
-        mIsBindService = true;
-    }
-
-    private void unbindService(){
-        if(mIsBindService){
-            mIsBindService = false;
-            unbindService(mConnection);
-        }
-    }
-}
-```
-##**AIDL高级用法**
-　　对于上面的例子，在AIDL接口中只是使用了一些Java的基本类型，对于AIDL文件并不是所有的类型都是可用的，那么在AIDL中究竟有哪些类型可以使用呢？
-###**AIDL语法规则**
-默认情况下AIDL支持以下数据类型：
-
-*  所有Java的基本数据类型（例如： int, long,double, char, boolean等）
-*  String和CharSequence
-*  List：AIDL实际接收到的是ArrayList，并且List里面所有元素都必须被AIDL支持
-*  Map: AIDL实际接收到的是HashMap，并且Map里面所有元素都必须被AIDL支持
-
-如果不是上面所述类型，我们必须要显示import进来，即使他们在同一个包中。当我们使用自定义的对象时必须实现Parcelable接口，Parcelable为对象序列化接口，效率比实现Serializable接口高。并且新建一个与该类同名的AIDL文件，声明他为Parcelable类型。
-
-我们定义AIDL接口还需要注意以下几点：
-
-*  方法可以有多个或没有参数，可以有返回值也可以为void
-* 在参数中，除了基本类型以外，我们必须为参数标上方向in, out, 或者 inout
-* 在AIDL文件中只支持方法，不支持静态常量
-###**演示**
-　　在计算机商店中需要采购笔记本进行销售，在服务端中我们添加两台笔记本，在客户端中我们为商店加购一台dell笔记本。
-![这里写图片描述](http://img.blog.csdn.net/20160220151944872)
+　　该方法存在于ViewGroup类中，对于View类并无此方法。表示是否拦截某个事件，ViewGroup如果成功拦截某个事件，那么这个事件就不在向下进行传递。对于同一个事件序列当中，当前View若是成功拦截该事件，那么对于后面的一系列事件不会再次调用该方法。返回的结果表示是否拦截当前事件，默认返回false。由于一个View它已经处于最底层，它不会存在子控件，所以无该方法。
 　　
-###**实体类代码**###
-　　我们首先构建一个计算机实体类，包含笔记本的id，品牌，型号，并且实现Parcelable接口，在AndroidStudio中会为我们自动构造代码。
+**public boolean onTouchEvent(MotionEvent event)**
+
+　　这个方法被dispatchTouchEvent调用，用来处理事件，对于返回的结果用来表示是否消耗掉当前事件。如果不消耗当前事件的话，那么对于在同一个事件序列当中，当前View就不会再次接收到事件。
 　　
+#**View事件分发流程图**
+　　对于事件的分发，在这里先通过一个流程图来看一下整个分发过程。
+![这里写图片描述](http://img.blog.csdn.net/20160511091631513)
+#**ViewGroup事件分发源码分析**
+　　根据上面的流程图现在就详细的来分析一下ViewGroup事件分发的整个过程。
+　　手指在触摸屏上滑动所产生的一系列事件，当Activity接收到这些事件通过调用Activity的dispatchTouchEvent方法来进行对事件的分发操作。下面就来看一下Activity的dispatchTouchEvent方法。
 ```
-package com.ljd.aidl.entity;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class ComputerEntity implements Parcelable{
-
-    public int computerId;     //id
-    public String brand;       //品牌
-    public String model;       //型号
-
-    public ComputerEntity(int computerId, String brand, String model) {
-        this.brand = brand;
-        this.computerId = computerId;
-        this.model = model;
+public boolean dispatchTouchEvent(MotionEvent ev) {
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+        onUserInteraction();
     }
-
-    protected ComputerEntity(Parcel in) {
-        computerId = in.readInt();
-        brand = in.readString();
-        model = in.readString();
+    if (getWindow().superDispatchTouchEvent(ev)) {
+        return true;
     }
+    return onTouchEvent(ev);
+}
+```
+　　通过getWindow().superDispatchTouchEvent(ev)这个方法可以看出来，这个时候Activity又会将事件交由Window处理。Window它是一个抽象类，它的具体实现只有一个PhoneWindow，也就是说这个时候，Activity将事件交由PhoneWindow中的superDispatchTouchEvent方法。现在跟踪进去看一下这个superDispatchTouchEvent代码。
+```
+public boolean superDispatchTouchEvent(MotionEvent event) {
+    return mDecor.superDispatchTouchEvent(event);
+}
+```
+　　这里面的mDecor它是一个DecorView，DecorView它是一个Activity的顶级View。它是PhoneWindow的一个内部类，继承自FrameLayout。于是在这个时候事件又交由DecorView的superDispatchTouchEvent方法来处理。下面就来看一下这个superDispatchTouchEvent方法。
+```
+public boolean superDispatchTouchEvent(MotionEvent event) {
+    return super.dispatchTouchEvent(event);
+}
+```
+　　在这个时候就能够很清晰的看到DecorView它调用了父类的dispatchTouchEvent方法。在上面说到DecorView它继承了FrameLayout，而这个FrameLayout又继承自ViewGroup。所以在这个时候事件就开始交给了ViewGroup进行处理了。下面就开始详细看下这个ViewGroup的dispatchTouchEvent方法。由于dispatchTouchEvent代码比较长，在这里就摘取部分代码进行说明。
+```
+// Handle an initial down.
+if (actionMasked == MotionEvent.ACTION_DOWN) {
+    // Throw away all previous state when starting a new touch gesture.
+    // The framework may have dropped the up or cancel event for the previous gesture
+    // due to an app switch, ANR, or some other state change.
+    cancelAndClearTouchTargets(ev);
+    resetTouchState();
+}
+```
+　　从上面代码可以看出，在dispatchTouchEvent中，会对接收的事件进行判断，当接收到的是ACTION_DOWN事件时，便会清空事件分发的目标和状态。然后执行resetTouchState方法重置了触摸状态。下面就来看一下这两个方法。
+　　**1.  cancelAndClearTouchTargets(ev)**
+```
+private TouchTarget mFirstTouchTarget;
 
-    public static final Creator<ComputerEntity> CREATOR = new Creator<ComputerEntity>() {
-        @Override
-        public ComputerEntity createFromParcel(Parcel in) {
-            return new ComputerEntity(in);
+......
+
+private void cancelAndClearTouchTargets(MotionEvent event) {
+    if (mFirstTouchTarget != null) {
+        boolean syntheticEvent = false;
+        if (event == null) {
+            final long now = SystemClock.uptimeMillis();
+            event = MotionEvent.obtain(now, now,
+                    MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
+            event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            syntheticEvent = true;
         }
 
-        @Override
-        public ComputerEntity[] newArray(int size) {
-            return new ComputerEntity[size];
+        for (TouchTarget target = mFirstTouchTarget; target != null; target = target.next) {
+            resetCancelNextUpFlag(target.child);
+            dispatchTransformedTouchEvent(event, true, target.child, target.pointerIdBits);
         }
-    };
+        clearTouchTargets();
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(computerId);
-        dest.writeString(brand);
-        dest.writeString(model);
+        if (syntheticEvent) {
+            event.recycle();
+        }
     }
 }
 ```
-###**AIDL代码**
-　　在AIDL中对实体类进行声明，包名和文件名必须与实体类一致。在AndroidStudio中新建一个与实体类同名的AIDL文件会报错，需要先用一个其它名字，然后修改与实体类名一致即可。
-
+　　在这里先介绍一下mFirstTouchTarget，它是TouchTarget对象，TouchTarget是ViewGroup的一个内部类，TouchTarget采用链表数据结构进行存储View。而在这个方法中主要的作用就是清空mFirstTouchTarget链表并将mFirstTouchTarget设为空。
+　　**2.  resetTouchState()**
 ```
-package com.ljd.aidl.entity;
-
-//包名必须和对用实体类的包名一致
-// Declare any non-default types here with import statements
-parcelable ComputerEntity;
-```
-　　添加两个接口分别为添加一台笔记本和获取全部笔记本，在该文件中使用到了ComputerEntity类，显示的import进来。
-
-```
-package com.ljd.aidl;
-
-import com.ljd.aidl.entity.ComputerEntity;
-// Declare any non-default types here with import statements
-
-interface IComputerManager {
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-     void addComputer(in ComputerEntity computer);
-     List<ComputerEntity> getComputerList();
+private void resetTouchState() {
+    clearTouchTargets();
+    resetCancelNextUpFlag(this);
+    mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;
+    mNestedScrollAxes = SCROLL_AXIS_NONE;
 }
 ```
-
-###**服务端代码**
-
+　　在这里介绍一下FLAG_DISALLOW_INTERCEPT标记，这是禁止ViewGroup拦截事件的标记，可以通过requestDisallowInterceptTouchEvent方法来设置这个标记，当设置了这个标记以后，ViewGroup便无法拦截除了ACTION_DOWN以外的其它事件。因为在上面代码中可以看出，当事件为ACTION_DOWN时，会重置FLAG_DISALLOW_INTERCEPT标记。
+　　那么下面就再次回到dispatchTouchEvent方法中继续看它的源代码。
 ```
-package com.ljd.aidl.service;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-import android.os.RemoteException;
-
-import com.ljd.aidl.IComputerManager;
-import com.ljd.aidl.entity.ComputerEntity;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-public class ComputerService extends Service {
-    private CopyOnWriteArrayList<ComputerEntity> mComputerList = new CopyOnWriteArrayList<>();
-
-    public ComputerService() {
+// Check for interception.
+final boolean intercepted;
+if (actionMasked == MotionEvent.ACTION_DOWN
+        || mFirstTouchTarget != null) {
+    final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+    if (!disallowIntercept) {
+        intercepted = onInterceptTouchEvent(ev);
+        ev.setAction(action); // restore action in case it was changed
+    } else {
+        intercepted = false;
     }
-
-    private final IComputerManager.Stub mBinder = new IComputerManager.Stub() {
-        @Override
-        public void addComputer(ComputerEntity computer) throws RemoteException {
-            mComputerList.add(computer);
-        }
-
-        @Override
-        public List<ComputerEntity> getComputerList() throws RemoteException {
-            return mComputerList;
-        }
-    };
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mComputerList.add(new ComputerEntity(0,"apple","macbookpro"));
-        mComputerList.add(new ComputerEntity(1,"microsoft","surfacebook"));
-        mComputerList.add(new ComputerEntity(2,"dell","XPS13"));
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
+} else {
+    // There are no touch targets and this action is not an initial down
+    // so this view group continues to intercept touches.
+    intercepted = true;
 }
 ```
-　　注意：在该类中使用了CopyOnWriteArrayList，CopyOnWriteArrayList能够自动进行线程同步。可是在AIDL中接收和返回的只能是ArrayList，其实AIDL支持的是抽象的List，在Binder中会按照List访问数据并最终形成一个ArrayList，所以在AIDL中返回的还是一个ArrayList。
-###**客户端代码**
-
+　　这段代码主要就是ViewGroup对事件是否需要拦截进行的判断。下面先对mFirstTouchTarget是否为null这两种情况进行说明。当事件没有被拦截时，ViewGroup的子元素成功处理事件后，mFirstTouchTarget会被赋值并且指向其子元素。也就是说这个时候mFirstTouchTarget!=null。可是一旦事件被拦截，mFirstTouchTarget不会被赋值，mFirstTouchTarget也就为null。
+　　在上面代码中可以看到根据actionMasked==MotionEvent.ACTION_DOWN||mFirstTouchTarget!=null这两个情况进行判断事件是否需要拦截。对于actionMasked==MotionEvent.ACTION_DOWN这个条件很好理解，对于mFirstTouchTarget!=null的两种情况上面已经说明。那么对于一个事件序列，当事件为MotionEvent.ACTION_DOWN时，会重置FLAG_DISALLOW_INTERCEPT，也就是说!disallowIntercept一定为true，必然会执行onInterceptTouchEvent方法，对于onInterceptTouchEvent方法默认返回为false，所以需要ViewGroup拦截事件时，必须重写onInterceptTouchEvent方法，并返回true。这里有一点需要注意，对于一个事件序列，一旦序列中的某一个事件被成功拦截，执行了onInterceptTouchEvent方法，也就是说onInterceptTouchEvent返回值为true，那么该事件之后一系列事件对于条件actionMasked==MotionEvent.ACTION_DOWN||mFirstTouchTarget!=null必然为false，那么这个时候该事件序列剩下的一系列事件将会被拦截，并且不会执行onInterceptTouchEvent方法。于是在这里得出一个结论：**对于一个事件序列，当其中某一个事件成功拦截时，那么对于剩下的一些列事件也会被拦截，并且不会再次执行onInterceptTouchEvent方法**
+　　下面再来看一下对于ViewGroup并没有拦截事件是如何进行处理的。
 ```
-package com.ljd.aidl.activity;
+final int childrenCount = mChildrenCount;
+if (newTouchTarget == null && childrenCount != 0) {
+    final float x = ev.getX(actionIndex);
+    final float y = ev.getY(actionIndex);
+    // Find a child that can receive the event.
+    // Scan children from front to back.
+    final ArrayList<View> preorderedList = buildOrderedChildList();
+    final boolean customOrder = preorderedList == null
+            && isChildrenDrawingOrderEnabled();
+    final View[] children = mChildren;
+    for (int i = childrenCount - 1; i >= 0; i--) {
+        final int childIndex = customOrder
+                ? getChildDrawingOrder(childrenCount, i) : i;
+        final View child = (preorderedList == null)
+                ? children[childIndex] : preorderedList.get(childIndex);
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.ljd.aidl.IComputerManager;
-import com.ljd.aidl.client.R;
-import com.ljd.aidl.entity.ComputerEntity;
-
-import java.util.List;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-public class Demo2Activity extends AppCompatActivity{
-
-    @Bind(R.id.show_linear)
-    LinearLayout mShowLinear;
-
-    private boolean mIsBindService;
-    private IComputerManager mRemoteComputerManager;
-    private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
-        @Override
-        public void binderDied() {
-            if(mRemoteComputerManager != null){
-                mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,0);
-                mRemoteComputerManager = null;
-                bindService();
+        // If there is a view that has accessibility focus we want it
+        // to get the event first and if not handled we will perform a
+        // normal dispatch. We may do a double iteration but this is
+        // safer given the timeframe.
+        if (childWithAccessibilityFocus != null) {
+            if (childWithAccessibilityFocus != child) {
+                continue;
             }
-        }
-    };
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mIsBindService = true;
-            Toast.makeText(Demo2Activity.this,"bind service success",Toast.LENGTH_SHORT).show();
-            mRemoteComputerManager = IComputerManager.Stub.asInterface(service);
-            try {
-                mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,0);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            childWithAccessibilityFocus = null;
+            i = childrenCount - 1;
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mRemoteComputerManager = null;
-        }
-    };
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_demo2);
-        ButterKnife.bind(this);
-        mIsBindService = false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        unbindService();
-        ButterKnife.unbind(this);
-        super.onDestroy();
-    }
-
-    @OnClick({R.id.bind_demo2_btn,R.id.unbind_demo2_btn,R.id.test_demo2_btn,R.id.clear_demo2_btn})
-    public void onClickButton(View v) {
-        switch (v.getId()){
-            case R.id.bind_demo2_btn:
-                bindService();
-                break;
-            case R.id.unbind_demo2_btn:
-                Toast.makeText(this,"unbind service success",Toast.LENGTH_SHORT).show();
-                unbindService();
-                break;
-            case R.id.test_demo2_btn:
-                if (!mIsBindService || mRemoteComputerManager == null){
-                    Toast.makeText(this,"not bind service",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                try {
-                    List<ComputerEntity> computerList = mRemoteComputerManager.getComputerList();
-                    for (int i =0;i<computerList.size();i++){
-                        String str = "computerId:" + String.valueOf(computerList.get(i).computerId) +
-                                " brand:" + computerList.get(i).brand +
-                                " model:" + computerList.get(i).model ;
-                        TextView textView = new TextView(this);
-                        textView.setText(str);
-                        mShowLinear.addView(textView);
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.clear_demo2_btn:
-                mShowLinear.removeAllViews();
-                break;
-        }
-    }
-
-    private void bindService(){
-        Intent intent = new Intent();
-        intent.setAction("com.ljd.aidl.action.COMPUTER_SERVICE");
-        mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void unbindService(){
-        if(!mIsBindService){
-            return;
-        }
-        mIsBindService = false;
-        unbindService(mConnection);
-    }
-}
-```
-　　由于Binder是有可能会意外死亡的，也就是Service所在进程被系统杀死，这时候我们调用Service的方法就会失败。在第一个例子中我们通过onServiceDisconnected方法中重新绑定服务。在这个例子中我们采用了另外一种方法，由于在Binder中提供了两个配对的方法linkToDeath和unlinkToDeath，通过linkToDeath可以给Binder设置一个死亡代理，Binder死亡时回调binderDied方法，在binderDied方法中我们重新绑定服务即可。
-##**AIDL用法拓展**
-　　当我们需要一种笔记本的时候，由于商店缺货，这时候我们会给卖家说一声，我所需要的这款笔记本到货后通知我。也就成了所谓的观察者模式。
-　　在Android系统中为我们提供了一个RemoteCallbackList,RemoteCallbackList是系统专门用来删除跨进程的listener接口，并且在RemoteCallbackList中自动实现了线程同步功能，下面看一下它的用法。
-###**演示**
-　　客户端注册服务以后，服务端每隔三秒会添加一台笔记本，并通知给客户端显示。
-![这里写图片描述](http://img.blog.csdn.net/20160220152001794)
-###**AIDL代码**
-　　到货后的AIDL监听接口
-　　
-```
-package com.ljd.aidl;
-
-import com.ljd.aidl.entity.ComputerEntity;
-// Declare any non-default types here with import statements
-
-interface IOnComputerArrivedListener {
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-    void onComputerArrived(in ComputerEntity computer);
-}
-```
-
-　　在IComputerManager接口中添加两个方法。显示importIOnComputerArrivedListener ,即使在同一个包下面。
-　　
-```
-// IComputerManagerObserver.aidl
-package com.ljd.aidl;
-
-import com.ljd.aidl.entity.ComputerEntity;
-import com.ljd.aidl.IOnComputerArrivedListener;
-// Declare any non-default types here with import statements
-
-interface IComputerManagerObserver {
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-     void addComputer(in ComputerEntity computer);
-     List<ComputerEntity> getComputerList();
-     void registerUser(IOnComputerArrivedListener listener);
-     void unRegisterUser(IOnComputerArrivedListener listener);
-}
-
-```
-
-###**服务端代码**
-
-```
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.os.RemoteCallbackList;
-import android.os.RemoteException;
-
-import com.ljd.aidl.IComputerManagerObserver;
-import com.ljd.aidl.IOnComputerArrivedListener;
-import com.ljd.aidl.entity.ComputerEntity;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-public class ComputerObserverService extends Service{
-    public ComputerObserverService() {
-    }
-
-    private CopyOnWriteArrayList<ComputerEntity> mComputerList = new CopyOnWriteArrayList<>();
-    private RemoteCallbackList<IOnComputerArrivedListener> mComputerArrivedListenerList = new RemoteCallbackList<>();
-    private AtomicBoolean mIsServiceDestroy = new AtomicBoolean(false);
-
-    private Binder mBinder = new IComputerManagerObserver.Stub(){
-
-        @Override
-        public void addComputer(ComputerEntity computer) throws RemoteException {
-            mComputerList.add(computer);
+        if (!canViewReceivePointerEvents(child)
+                || !isTransformedTouchPointInView(x, y, child, null)) {
+            ev.setTargetAccessibilityFocus(false);
+            continue;
         }
 
-        @Override
-        public List<ComputerEntity> getComputerList() throws RemoteException {
-            return mComputerList;
+        newTouchTarget = getTouchTarget(child);
+        if (newTouchTarget != null) {
+            // Child is already receiving touch within its bounds.
+            // Give it the new pointer in addition to the ones it is handling.
+            newTouchTarget.pointerIdBits |= idBitsToAssign;
+            break;
         }
 
-        @Override
-        public void registerUser(IOnComputerArrivedListener listener) throws RemoteException {
-            mComputerArrivedListenerList.register(listener);
-        }
-
-        @Override
-        public void unRegisterUser(IOnComputerArrivedListener listener) throws RemoteException {
-            mComputerArrivedListenerList.unregister(listener);
-        }
-    };
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mComputerList.add(new ComputerEntity(0,"apple","macbookpro"));
-        mComputerList.add(new ComputerEntity(1,"microsoft","surfacebook"));
-        mComputerList.add(new ComputerEntity(2,"dell","XPS13"));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!mIsServiceDestroy.get()){
-                    try {
-                        Thread.currentThread().sleep(3000);
-                        ComputerEntity computer = new ComputerEntity(mComputerList.size(),"******","******");
-                        mComputerList.add(computer);
-                        final int COUNT = mComputerArrivedListenerList.beginBroadcast();
-                        //通知所有注册过的用户
-                        for (int i=0;i<COUNT;i++){
-                            IOnComputerArrivedListener listener = mComputerArrivedListenerList.getBroadcastItem(i);
-                            if (listener != null){
-                                listener.onComputerArrived(computer);
-                            }
-                        }
-                        mComputerArrivedListenerList.finishBroadcast();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+        resetCancelNextUpFlag(child);
+        if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
+            // Child wants to receive touch within its bounds.
+            mLastTouchDownTime = ev.getDownTime();
+            if (preorderedList != null) {
+                // childIndex points into presorted list, find original index
+                for (int j = 0; j < childrenCount; j++) {
+                    if (children[childIndex] == mChildren[j]) {
+                        mLastTouchDownIndex = j;
+                        break;
                     }
                 }
+            } else {
+                mLastTouchDownIndex = childIndex;
             }
-        }).start();
-    }
+            mLastTouchDownX = ev.getX();
+            mLastTouchDownY = ev.getY();
+            newTouchTarget = addTouchTarget(child, idBitsToAssign);
+            alreadyDispatchedToNewTouchTarget = true;
+            break;
+        }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
+        // The accessibility focus didn't handle the event, so clear
+        // the flag and do a normal dispatch to all children.
+        ev.setTargetAccessibilityFocus(false);
     }
+    if (preorderedList != null) preorderedList.clear();
+}
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mIsServiceDestroy.set(true);
-    }
+```
+　　对于这段代码虽然说比较长，但是在这里面的逻辑去不是很复杂。首先获取当前ViewGroup中的子View和ViewGroup的数量。然后对该ViewGroup中的元素进行逐步遍历。在获取到ViewGroup中的子元素后，判断该元素是否能够接收触摸事件。子元素若是能够接收触摸事件，并且该触摸坐标在子元素的可视范围内的话，便继续向下执行。否则就continue。对于衡量子元素能否接收到触摸事件的标准有两个：子元素是否在播放动画和点击事件的坐标是否在子元素的区域内。
+　　一旦子View接收到了触摸事件，然后便开始调用dispatchTransformedTouchEvent方法对事件进行分发处理。对于dispatchTransformedTouchEvent方法代码比较多，现在只关注下面这五行代码。从下面5行代码中可以看出，这时候会调用子View的dispatchTouchEvent，也就是在这个时候ViewGroup已经完成了事件分发的整个过程。
+```
+if (child == null) {
+    handled = super.dispatchTouchEvent(event);
+} else {
+    handled = child.dispatchTouchEvent(event);
 }
 ```
-　　注意：RemoteCallbackList并不是一个List，所以我们不能像操作List一样操作RemoteCallbackList。并且遍历RemoteCallbackList时，beginBroadcast和finishBroadcast是配对使用的。
-###**客户端代码**
+　　当子元素的dispatchTouchEvent返回为true的时候，也就是子View对事件处理成功。这时候便会通过addTouchTarget方法对mFirstTouchTarget进行赋值。
+　　如果dispatchTouchEvent返回了false，或者说当前的ViewGroup没有子元素的话，那么这个时候便会调用如下代码。
 ```
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.RemoteException;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.ljd.aidl.IComputerManagerObserver;
-import com.ljd.aidl.IOnComputerArrivedListener;
-import com.ljd.aidl.client.R;
-import com.ljd.aidl.entity.ComputerEntity;
-
-import java.util.List;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-public class Demo3Activity extends AppCompatActivity {
-
-    @Bind(R.id.show_demo3_linear)
-    LinearLayout mShowLinear;
-
-    private boolean mIsBindService;
-    private static final int MESSAGE_COMPUTER_ARRIVED = 1;
-
-    private IComputerManagerObserver mRemoteComputerManager;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case MESSAGE_COMPUTER_ARRIVED:
-                    ComputerEntity computer = (ComputerEntity)msg.obj;
-                    String str = "computerId:" + String.valueOf(computer.computerId) +
-                            " brand:" + computer.brand +
-                            " model:" + computer.model ;
-                    TextView textView = new TextView(Demo3Activity.this);
-                    textView.setText(str);
-                    mShowLinear.addView(textView);
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-
-        }
-    };
-
-    private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() {
-        @Override
-        public void binderDied() {
-            if(mRemoteComputerManager != null){
-                mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,0);
-                mRemoteComputerManager = null;
-                bindService();
-            }
-        }
-    };
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mIsBindService = true;
-            Toast.makeText(Demo3Activity.this,"bind service success",Toast.LENGTH_SHORT).show();
-            mRemoteComputerManager = IComputerManagerObserver.Stub.asInterface(service);
-            try {
-                mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,0);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mRemoteComputerManager = null;
-        }
-    };
-
-    private IOnComputerArrivedListener mOnComputerArrivedListener = new IOnComputerArrivedListener.Stub(){
-
-        @Override
-        public void onComputerArrived(ComputerEntity computer) throws RemoteException {
-            mHandler.obtainMessage(MESSAGE_COMPUTER_ARRIVED,computer).sendToTarget();
-        }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_demo3);
-        ButterKnife.bind(this);
-        mIsBindService = false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        unbindService();
-        ButterKnife.unbind(this);
-        super.onDestroy();
-    }
-
-    @OnClick({R.id.bind_demo3_btn,R.id.unbind_demo3_btn,R.id.test_demo3_btn,R.id.clear_demo3_btn})
-    public void onClickButton(View v){
-        switch (v.getId()){
-            case R.id.bind_demo3_btn:
-                bindService();
-                break;
-            case R.id.unbind_demo3_btn:
-                Toast.makeText(this,"unbind service success",Toast.LENGTH_SHORT).show();
-                unbindService();
-                break;
-            case R.id.test_demo3_btn:
-                if (!mIsBindService || mRemoteComputerManager == null){
-                    Toast.makeText(this,"not bind service",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                try {
-                    ComputerEntity computer = new ComputerEntity(3,"hp","envy13");
-                    mRemoteComputerManager.addComputer(computer);
-                    List<ComputerEntity> computerList = mRemoteComputerManager.getComputerList();
-                    for (int i =0;i<computerList.size();i++){
-                        String str = "computerId:" + String.valueOf(computerList.get(i).computerId) +
-                                " brand:" + computerList.get(i).brand +
-                                " model:" + computerList.get(i).model ;
-                        TextView textView = new TextView(this);
-                        textView.setText(str);
-                        mShowLinear.addView(textView);
-                    }
-                    mRemoteComputerManager.registerUser(mOnComputerArrivedListener);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.clear_demo3_btn:
-                mShowLinear.removeAllViews();
-                break;
-        }
-    }
-
-    private void bindService(){
-        Intent intent = new Intent();
-        intent.setAction("com.ljd.aidl.action.COMPUTER_OBSERVER_SERVICE");
-        mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void unbindService(){
-        if(!mIsBindService){
-            return;
-        }
-        if (mRemoteComputerManager != null && mRemoteComputerManager.asBinder().isBinderAlive()){
-            try {
-                mRemoteComputerManager.unRegisterUser(mOnComputerArrivedListener);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        unbindService(mConnection);
-        mIsBindService = false;
-    }
+if (mFirstTouchTarget == null) {
+    // No touch targets so treat this as an ordinary view.
+    handled = dispatchTransformedTouchEvent(ev, canceled, null,
+            TouchTarget.ALL_POINTER_IDS);
 }
 ```
-#**[源码下载](https://github.com/lijiangdong/aidl.git)**
+　　在这里调用dispatchTransformedTouchEvent方法，并将child参数设为null。也就是执行了super.dispatchTouchEvent(event)方法。由于ViewGroup继承自View，所以这个时候又将事件交由自己处理。
+　　到这里对于ViewGroup的事件分发已经讲完了，在这一路下来，不难发现对于dispatchTouchEvent有一个boolean类型返回值。对于这个返回值，当返回true的时候表示当前事件处理成功，若是返回false，一般来说是因为在事件处理onTouchEvent返回了false，这时候变会交由它的父控件进行处理，最终会交由Activity的onTouchEvent方法进行处理。
+#**总结**
+　　在这里从宏观上再看一下这个ViewGroup对事件的分发，当ViewGroup接收一个事件序列以后，首先会判断是否拦截该事件，若是拦截该事件，则将这个事件交由自己处理。若是不去拦截这一事件，便将该事件下发到子View当中。若果说ViewGroup没有子View，或者说子View对事件处理失败，则将该事件有交由该ViewGroup处理，若是该ViewGroup对事件依然处理失败，最终则会将事件交由Activity进行处理。
