@@ -12,7 +12,7 @@ comments: true
     {% if post.image.feature %}
       <div class="entry-image-index">
         <a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}"><img src="{{ site.url }}/images/{{ post.image.feature }}" alt="{{ post.title }}"></a>
-        {% if post.image.credit %}<div class="image-credit">Image source: <a target="_blank" href="{{ post.image.creditlink }}">{{ post.image.credit }}</a></div><!-- /.image-credit -->{% endif %} 
+        {% if post.image.credit %}<div class="image-credit">Image source: <a target="_blank" href="{{ post.image.creditlink }}">{{ post.image.credit }}</a></div><!-- /.image-credit -->{% endif %}
 
       </div><!-- /.entry-image -->
     {% endif %}
@@ -33,8 +33,8 @@ comments: true
     {% endif %}
   </header>
   <div class="entry-content">
-    {% if post.content contains "<!-- more -->" %}
-    {{ post.content | split:"<!-- more -->" | first % }}
+    {% if post.content contains "more" %}
+    {{ post.content | split:"more" | first % }}
     {% else %}
       {{ post.content }}
     {% endif %}

@@ -1,7 +1,7 @@
 title:            李江东
 description:      Describe your website here.
 # put your disqus here
-disqus_shortname: 
+disqus_shortname: ljd
 reading_time:     true # if true, shows the estimated reading time for a post
 words_per_minute: 200
 logo:             images/logo.png # logo visible in the topbar
@@ -17,27 +17,25 @@ url: http://www.lijiangdong.com
 #   To create sub categories. add a submenu item
 # See the example
 menu:
-  - title: '主页'
+  - title: 'Home'
     url: '/'
-  - title: '博客'
+  - title: 'Blog'
     url: '/blog'
+  - title: 'GitHub'
+    url: 'https://github.com/lijiangdong'
  # - title: 'Fork'
  #   url: 'http://github.com/aron-bordin/neo-hpstr-jekyll-theme'
  # - title: 'Install'
  #   url: '/theme-setup/'
-  - title: '标签'
+  - title: 'Tags'
     url: '/tags'
-  - title: '分类'
+  - title: 'Categories'
     url: '/categories'
     type: 'categories'
  # - title: 'Favorites'
  #   url: '#'
-  - title: '关于'
-    submenu:
-      - title: 'Code Highlighter'
-        url: '/intro/code-highlighting-post/'
-      - title: 'Sample Post'
-        url: '/intro/sample-post/'
+  - title: 'About'
+    url: '/about'
 
 # Owner/author information
 owner:
