@@ -4,12 +4,12 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="http://127.0.0.1:4000/feed.xml" />
 <link rel="alternate" type="text/html" href="http://127.0.0.1:4000" />
-<updated>2016-05-11T21:35:28-04:00</updated>
+<updated>2016-05-12T10:18:20+08:00</updated>
 <id>http://127.0.0.1:4000/</id>
 <author>
   <name>李江东</name>
   <uri>http://127.0.0.1:4000/</uri>
-  <email>lid2038@gmail.com</email>
+  <email>ljd2038@gmail.com</email>
 </author>
 
 
@@ -17,12 +17,12 @@
   <title type="html"><![CDATA[Sample Post with Feature Image]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/feature-image/" />
   <id>http://127.0.0.1:4000/feature-image</id>
-  <published>2013-10-28T00:00:00-04:00</published>
-  <updated>2013-10-28T00:00:00-04:00</updated>
+  <published>2013-10-28T00:00:00+08:00</published>
+  <updated>2013-10-28T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;This post demonstrate how to use feature images on your posts.&lt;/p&gt;
@@ -45,12 +45,12 @@
   <title type="html"><![CDATA[Dark Post]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/dark-post/" />
   <id>http://127.0.0.1:4000/dark-post</id>
-  <published>2013-10-28T00:00:00-04:00</published>
-  <updated>2013-10-28T00:00:00-04:00</updated>
+  <published>2013-10-28T00:00:00+08:00</published>
+  <updated>2013-10-28T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;This is a sample post to show the dark post theme. To use this dark theme, just add:&lt;/p&gt;
@@ -68,12 +68,12 @@
   <title type="html"><![CDATA[Post with a Background Image]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/image/background-image/" />
   <id>http://127.0.0.1:4000/image/background-image</id>
-  <published>2013-10-26T00:00:00-04:00</published>
-  <updated>2013-10-26T00:00:00-04:00</updated>
+  <published>2013-10-26T00:00:00+08:00</published>
+  <updated>2013-10-26T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;Here be a sample post with a custom background image. To utilize this “feature” just add the following YAML to a post’s front matter.&lt;/p&gt;
@@ -97,12 +97,12 @@
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/intro/code-highlighting-post/" />
   <id>http://127.0.0.1:4000/intro/code-highlighting-post</id>
   <updated>2014-12-23T00:00:00-00:00</updated>
-  <published>2013-08-16T00:00:00-04:00</published>
+  <published>2013-08-16T00:00:00+08:00</published>
   
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;Syntax highlighting is a feature that displays source code, in different colors and fonts according to the category of terms. This feature facilitates writing in a structured language such as a programming language or a markup language as both structures and syntax errors are visually distinct. Highlighting does not affect the meaning of the text itself; it is intended only for human readers.&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
@@ -174,12 +174,12 @@
   <title type="html"><![CDATA[Sample Link Post]]></title>
  <link rel="alternate" type="text/html" href="http://mademistakes.com" />
   <id>http://127.0.0.1:4000/intro/sample-link-post</id>
-  <published>2013-08-12T00:00:00-04:00</published>
-  <updated>2013-08-12T00:00:00-04:00</updated>
+  <published>2013-08-12T00:00:00+08:00</published>
+  <updated>2013-08-12T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;This theme supports &lt;strong&gt;link posts&lt;/strong&gt;, made famous by John Gruber. To use, just add &lt;code class=&quot;highlighter-rouge&quot;&gt;link: http://url-you-want-linked&lt;/code&gt; to the post’s YAML front matter and you’re done.&lt;/p&gt;
@@ -193,12 +193,12 @@
   <title type="html"><![CDATA[A Post with a Video]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/intro/video-post/" />
   <id>http://127.0.0.1:4000/intro/video-post</id>
-  <published>2013-06-25T00:00:00-04:00</published>
-  <updated>2013-06-25T00:00:00-04:00</updated>
+  <published>2013-06-25T00:00:00+08:00</published>
+  <updated>2013-06-25T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;//www.youtube.com/embed/SU3kYxJmWuQ&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
@@ -222,12 +222,12 @@
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/intro/readability-feature-post/" />
   <id>http://127.0.0.1:4000/intro/readability-feature-post</id>
   <updated>2013-06-30T00:00:00-00:00</updated>
-  <published>2013-05-23T00:00:00-04:00</published>
+  <published>2013-05-23T00:00:00+08:00</published>
   
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;This is a sample post with a large feature image up top and tons of text. Odio ad blue bottle vinyl, 90’s narwhal commodo bitters pour-over nostrud. Ugh est hashtag in, fingerstache adipisicing laboris esse Pinterest shabby chic Portland. Shoreditch bicycle rights anim, flexitarian laboris put a bird on it vinyl cupidatat narwhal. Hashtag artisan skateboard, flannel Bushwick nesciunt salvia aute fixie do plaid post-ironic dolor McSweeney’s. Cliche pour-over chambray nulla four loko skateboard sapiente hashtag.&lt;/p&gt;
@@ -282,12 +282,12 @@
   <title type="html"><![CDATA[A Post with Images]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/sample/intro/sample-post-images/" />
   <id>http://127.0.0.1:4000/sample/intro/sample-post-images</id>
-  <published>2013-05-22T00:00:00-04:00</published>
-  <updated>2013-05-22T00:00:00-04:00</updated>
+  <published>2013-05-22T00:00:00+08:00</published>
+  <updated>2013-05-22T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;Here are some examples of what a post with images might look like. If you want to display two or three images next to each other responsively use &lt;code class=&quot;highlighter-rouge&quot;&gt;figure&lt;/code&gt; with the appropriate &lt;code class=&quot;highlighter-rouge&quot;&gt;class&lt;/code&gt;. Each instance of &lt;code class=&quot;highlighter-rouge&quot;&gt;figure&lt;/code&gt; is auto-numbered and displayed in the caption.&lt;/p&gt;
@@ -397,12 +397,12 @@ Available values: [1..3].&lt;/li&gt;
   <title type="html"><![CDATA[Testing Readability with a Bunch of Text]]></title>
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/intro/readability-post/" />
   <id>http://127.0.0.1:4000/intro/readability-post</id>
-  <published>2012-05-22T00:00:00-04:00</published>
-  <updated>2012-05-22T00:00:00-04:00</updated>
+  <published>2012-05-22T00:00:00+08:00</published>
+  <updated>2012-05-22T00:00:00+08:00</updated>
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;Portland in &lt;code class=&quot;highlighter-rouge&quot;&gt;shoreditch Vice, labore typewriter pariatur hoodie fap sartorial Austin.&lt;/code&gt; Pinterest literally occupy Schlitz forage. Odio ad blue bottle vinyl, 90’s narwhal commodo bitters pour-over nostrud. Ugh est hashtag in, fingerstache adipisicing laboris esse Pinterest shabby chic Portland. Shoreditch bicycle rights anim, flexitarian laboris put a bird on it vinyl cupidatat narwhal. Hashtag artisan skateboard, flannel Bushwick nesciunt salvia aute fixie do plaid post-ironic dolor McSweeney’s. Cliche pour-over chambray nulla four loko skateboard sapiente hashtag.&lt;/p&gt;
@@ -456,12 +456,12 @@ Available values: [1..3].&lt;/li&gt;
  <link rel="alternate" type="text/html" href="http://127.0.0.1:4000/intro/sample-post/" />
   <id>http://127.0.0.1:4000/intro/sample-post</id>
   <updated>2014-12-24T00:00:00-00:00</updated>
-  <published>2011-03-10T00:00:00-05:00</published>
+  <published>2011-03-10T00:00:00+08:00</published>
   
   <author>
     <name>李江东</name>
     <uri>http://127.0.0.1:4000</uri>
-    <email>lid2038@gmail.com</email>
+    <email>ljd2038@gmail.com</email>
   </author>
   <content type="html">
     &lt;p&gt;Below is just about everything you’ll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.&lt;/p&gt;
