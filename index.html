@@ -1,9 +1,9 @@
 ---
 layout: post-index
-title: "Welcome to the Neo-HPSTR Blog"
+title: "欢迎来到李江东的博客"
 description: "Describe this nonsense."
-tags: [Jekyll, theme, themes, responsive, blog, modern]
-comments: false
+tags: [blog]
+comments: true
 ---
 
 {% for post in paginator.posts %}
@@ -12,7 +12,7 @@ comments: false
     {% if post.image.feature %}
       <div class="entry-image-index">
         <a href="{{ site.url }}{{ post.url }}" title="{{ post.title }}"><img src="{{ site.url }}/images/{{ post.image.feature }}" alt="{{ post.title }}"></a>
-        {% if post.image.credit %}<div class="image-credit">Image source: <a target="_blank" href="{{ post.image.creditlink }}">{{ post.image.credit }}</a></div><!-- /.image-credit -->{% endif %}
+        {% if post.image.credit %}<div class="image-credit">Image source: <a target="_blank" href="{{ post.image.creditlink }}">{{ post.image.credit }}</a></div><!-- /.image-credit -->{% endif %} 
 
       </div><!-- /.entry-image -->
     {% endif %}
