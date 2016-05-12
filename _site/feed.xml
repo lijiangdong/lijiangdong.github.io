@@ -4,7 +4,7 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="http://www.lijiangdong.com/feed.xml" />
 <link rel="alternate" type="text/html" href="http://www.lijiangdong.com" />
-<updated>2016-05-13T00:16:08+08:00</updated>
+<updated>2016-05-13T00:25:53+08:00</updated>
 <id>http://www.lijiangdong.com/</id>
 <author>
   <name>李江东</name>
@@ -30,13 +30,13 @@
 
 &lt;p&gt;　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。&lt;/p&gt;
 
-&lt;h2 id=&quot;aidl&quot;&gt;&lt;strong&gt;AIDL简介&lt;/strong&gt;&lt;/h2&gt;
+&lt;h2&gt;AIDL简介&lt;/h2&gt;
 
 &lt;p&gt;　　AIDL是 Android Interface Definition Language的缩写。AIDL 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行 IPC的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。&lt;/p&gt;
 
 &lt;p&gt;　　AIDL机制是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。&lt;/p&gt;
 
-&lt;h2 id=&quot;aidl-1&quot;&gt;&lt;strong&gt;AIDL用法&lt;/strong&gt;&lt;/h2&gt;
+&lt;h2&gt;AIDL用法&lt;/h2&gt;
 
 &lt;p&gt;　　首先我们创建一个AIDL文件，在AndroidStudio中当我们创建一个AIDL文件时会自动为我们创件一个AILD文件夹,用于存放AIDL文件。创建完之后重新rebuild会自动生成aidl实现类。&lt;/p&gt;
 
@@ -44,7 +44,7 @@
 
 &lt;p&gt;　　在下面的例子当中，我们将Service单独作为一个应用在系统中运行，在另一个用于访问Service的client也单独作为一个应用运行在系统中。这样保证了两个程序分别运行在两个进程中。并且使用了&lt;a href=&quot;https://github.com/JakeWharton/butterknife&quot;&gt;butterknife&lt;/a&gt;进行控件绑定。&lt;/p&gt;
 
-&lt;h3 id=&quot;aidl-2&quot;&gt;&lt;strong&gt;AIDL简单用法&lt;/strong&gt;&lt;/h3&gt;
+&lt;h3&gt;AIDL简单用法&lt;/h3&gt;
 
 &lt;p&gt;&lt;strong&gt;演示&lt;/strong&gt;&lt;/p&gt;
 
@@ -331,7 +331,7 @@
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h3 id=&quot;aidl-3&quot;&gt;&lt;strong&gt;AIDL高级用法&lt;/strong&gt;&lt;/h3&gt;
+&lt;h3&gt;AIDL高级用法&lt;/h3&gt;
 
 &lt;p&gt;　　对于上面的例子，在AIDL接口中只是使用了一些Java的基本类型，对于AIDL文件并不是所有的类型都是可用的，那么在AIDL中究竟有哪些类型可以使用呢？&lt;/p&gt;
 
@@ -855,7 +855,7 @@
 
 &lt;p&gt;　　由于Binder是有可能会意外死亡的，也就是Service所在进程被系统杀死，这时候我们调用Service的方法就会失败。在第一个例子中我们通过onServiceDisconnected方法中重新绑定服务。在这个例子中我们采用了另外一种方法，由于在Binder中提供了两个配对的方法linkToDeath和unlinkToDeath，通过linkToDeath可以给Binder设置一个死亡代理，Binder死亡时回调binderDied方法，在binderDied方法中我们重新绑定服务即可。&lt;/p&gt;
 
-&lt;h3 id=&quot;aidl-4&quot;&gt;&lt;strong&gt;AIDL用法拓展&lt;/strong&gt;&lt;/h3&gt;
+&lt;h3&gt;AIDL用法拓展&lt;/h3&gt;
 
 &lt;p&gt;　　当我们需要一种笔记本的时候，由于商店缺货，这时候我们会给卖家说一声，我所需要的这款笔记本到货后通知我。也就成了所谓的观察者模式。
 　　在Android系统中为我们提供了一个RemoteCallbackList,RemoteCallbackList是系统专门用来删除跨进程的listener接口，并且在RemoteCallbackList中自动实现了线程同步功能，下面看一下它的用法。&lt;/p&gt;
@@ -1458,7 +1458,7 @@
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h1 id=&quot;httpsgithubcomlijiangdongaidlgit&quot;&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/lijiangdong/aidl.git&quot;&gt;源码下载&lt;/a&gt;&lt;/strong&gt;&lt;/h1&gt;
+&lt;h1&gt;&lt;a href=&quot;https://github.com/lijiangdong/aidl.git&quot;&gt;源码下载&lt;/a&gt;&lt;/h1&gt;
 
 
     &lt;p&gt;&lt;a href=&quot;http://www.lijiangdong.com/android/ipc1-aidl/&quot;&gt;Android的IPC机制（一）—AIDL的使用&lt;/a&gt; was originally published by 李江东 at &lt;a href=&quot;http://www.lijiangdong.com&quot;&gt;李江东&lt;/a&gt; on February 20, 2016.&lt;/p&gt;

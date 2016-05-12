@@ -217,13 +217,13 @@
 
 <p>　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。</p>
 
-<h2 id="aidl"><strong>AIDL简介</strong></h2>
+<h2>AIDL简介</h2>
 
 <p>　　AIDL是 Android Interface Definition Language的缩写。AIDL 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行 IPC的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。</p>
 
 <p>　　AIDL机制是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。</p>
 
-<h2 id="aidl-1"><strong>AIDL用法</strong></h2>
+<h2>AIDL用法</h2>
 
 <p>　　首先我们创建一个AIDL文件，在AndroidStudio中当我们创建一个AIDL文件时会自动为我们创件一个AILD文件夹,用于存放AIDL文件。创建完之后重新rebuild会自动生成aidl实现类。</p>
 
@@ -231,7 +231,7 @@
 
 <p>　　在下面的例子当中，我们将Service单独作为一个应用在系统中运行，在另一个用于访问Service的client也单独作为一个应用运行在系统中。这样保证了两个程序分别运行在两个进程中。并且使用了<a href="https://github.com/JakeWharton/butterknife">butterknife</a>进行控件绑定。</p>
 
-<h3 id="aidl-2"><strong>AIDL简单用法</strong></h3>
+<h3>AIDL简单用法</h3>
 
 <p><strong>演示</strong></p>
 
@@ -518,7 +518,7 @@
 <span class="o">}</span><span class="w">
 </span></pre></td></tr></tbody></table></code></pre></figure>
 
-<h3 id="aidl-3"><strong>AIDL高级用法</strong></h3>
+<h3>AIDL高级用法</h3>
 
 <p>　　对于上面的例子，在AIDL接口中只是使用了一些Java的基本类型，对于AIDL文件并不是所有的类型都是可用的，那么在AIDL中究竟有哪些类型可以使用呢？</p>
 
@@ -1042,7 +1042,7 @@
 
 <p>　　由于Binder是有可能会意外死亡的，也就是Service所在进程被系统杀死，这时候我们调用Service的方法就会失败。在第一个例子中我们通过onServiceDisconnected方法中重新绑定服务。在这个例子中我们采用了另外一种方法，由于在Binder中提供了两个配对的方法linkToDeath和unlinkToDeath，通过linkToDeath可以给Binder设置一个死亡代理，Binder死亡时回调binderDied方法，在binderDied方法中我们重新绑定服务即可。</p>
 
-<h3 id="aidl-4"><strong>AIDL用法拓展</strong></h3>
+<h3>AIDL用法拓展</h3>
 
 <p>　　当我们需要一种笔记本的时候，由于商店缺货，这时候我们会给卖家说一声，我所需要的这款笔记本到货后通知我。也就成了所谓的观察者模式。
 　　在Android系统中为我们提供了一个RemoteCallbackList,RemoteCallbackList是系统专门用来删除跨进程的listener接口，并且在RemoteCallbackList中自动实现了线程同步功能，下面看一下它的用法。</p>
@@ -1645,7 +1645,7 @@
 <span class="o">}</span><span class="w">
 </span></pre></td></tr></tbody></table></code></pre></figure>
 
-<h1 id="httpsgithubcomlijiangdongaidlgit"><strong><a href="https://github.com/lijiangdong/aidl.git">源码下载</a></strong></h1>
+<h1><a href="https://github.com/lijiangdong/aidl.git">源码下载</a></h1>
 
 
       <footer class="entry-meta">
