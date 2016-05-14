@@ -5,7 +5,7 @@ description: "Just about everything you'll need to style in the theme: headings,
 modified: 2014-12-24
 tags: [sample post]
 categories: [intro]
-published: false
+published: true
 ---
 
 Below is just about everything you'll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.
@@ -24,7 +24,7 @@ Below is just about everything you'll need to style in the theme. Check the sour
 
 ### Body text
 
-Lorem ipsum dolor sit amet, test link adipiscing elit. **This is strong**. Nullam dignissim convallis est. Quisque aliquam.
+Lorem ipsum dolor sit amet, test link adipiscing elit. **This is strong**. Nullam dignissim convallis est. Quisque aliquam.more
 
 ![Smithsonian Image]({{ site.url }}/images/3953273590_704e3899d5_m.jpg)
 {: .image-right}

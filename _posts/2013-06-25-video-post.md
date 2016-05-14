@@ -4,7 +4,7 @@ title: "A Post with a Video"
 description: "Custom written post descriptions are the way to go... if you're not lazy."
 tags: [sample post, video]
 categories: [intro]
-published: false
+published: true
 ---
 
 {::nomarkdown}
@@ -13,7 +13,7 @@ published: false
 
 Video embeds are responsive and scale with the width of the main content block with the help of [FitVids](http://fitvidsjs.com/).
 
-Adding YouTube video embeds causes errors when building your Jekyll site. To fix wrap the html within `{::nomarkdown}` tags. Example below:
+Adding YouTube video embeds causes errors when building your Jekyll site. To fix wrap the html within `{::nomarkdown}` tags. Example below:more
 
 {% highlight html %}
 {::nomarkdown}
