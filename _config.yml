@@ -8,8 +8,8 @@ logo:             images/logo.png # logo visible in the topbar
 # Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
 # When testing locally leave blank or use http://localhost:4000
 
-#url: http://127.0.0.1:4000
-url: http://www.lijiangdong.com
+url: http://127.0.0.1:4000
+#url: http://www.lijiangdong.com
 
 # draw your top menu here
 # each item must have a title and a url.
@@ -19,10 +19,8 @@ url: http://www.lijiangdong.com
 menu:
   - title: 'Home'
     url: '/'
-  - title: 'Blog'
+  - title: 'CSDN'
     url: '/blog'
-  - title: 'GitHub'
-    url: 'https://github.com/lijiangdong'
  # - title: 'Fork'
  #   url: 'http://github.com/aron-bordin/neo-hpstr-jekyll-theme'
  # - title: 'Install'
@@ -44,14 +42,10 @@ owner:
   avatar:         images/avatar.jpg
   bio:            "用代码书写这个世界。"
   email:          ljd2038@gmail.com
-  # Twitter nick for use in Twitter cards and follow button.
-  twitter: lijiangdong # if no twitter in this config, the twitter follow button will be removed
+  # Weibo nick for use in Twitter cards and follow button.
+  weibo: lijiangdong # if no weibo in this config, the weibo follow button will be removed
   # GitHub nick for use in follow button in author block.
   github: lijiangdong
-
-# Twitter account associated with the site if different from owner/author twitter account.
-# Used in Twitter cards.
-twitter: 
 
 # Social networking links used in author block underneath posts. Update and remove as you like.
 social:
