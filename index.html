@@ -33,13 +33,17 @@ comments: true
     {% endif %}
   </header>
   <div class="entry-content">
-    {% if post.content contains "more" %}
+    {% if post.content contains "<!--more-->" %}
     {{ post.content | split:"more" | first % }}
     {% else %}
       {{ post.content }}
     {% endif %}
   </div><!-- /.entry-content -->
+  <div class="entry-content" align="right">
+    {% if post.content contains "<!--more-->" %}
+    <a href="{{ site.url }}{{ post.url }}" text-decoration:none>阅读全文...</a>
+    {% endif %}
+  </div>
 </article><!-- /.hentry -->
 {% endfor %}
-
 {% include pagination.html %}
