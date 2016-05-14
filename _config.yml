@@ -1,15 +1,15 @@
 title:            李江东
 description:      Describe your website here.
 # put your disqus here
-disqus_shortname: ljd
+disqus_shortname: lijiangdong
 reading_time:     true # if true, shows the estimated reading time for a post
 words_per_minute: 200
 logo:             images/logo.png # logo visible in the topbar
 # Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
 # When testing locally leave blank or use http://localhost:4000
 
-#url: http://127.0.0.1:4000
-url: http://www.lijiangdong.com
+url: http://127.0.0.1:4000
+#url: http://www.lijiangdong.com
 
 # draw your top menu here
 # each item must have a title and a url.
@@ -19,17 +19,19 @@ url: http://www.lijiangdong.com
 menu:
   - title: 'Home'
     url: '/'
+  - title: 'Posts'
+    url: '/posts'
   - title: 'Categories'
     url: '/categories'
+  - title: 'Tags'
+    url: '/tags'
+  - title: 'CSDN'
+    url: '/blog'
  #   type: 'categories'
  # - title: 'Fork'
  #   url: 'http://github.com/aron-bordin/neo-hpstr-jekyll-theme'
  # - title: 'Install'
  #   url: '/theme-setup/'
-  - title: 'Tags'
-    url: '/tags'
-  - title: 'CSDN'
-    url: '/blog'
  # - title: 'Favorites'
  #   url: '#'
  # - title: 'About'
@@ -37,7 +39,9 @@ menu:
 
 # Owner/author information
 owner:
-  name:           李江东
+  id:             无嘴小呆子
+  name:           Li Jiangdong
+
   site:           http://www.lijiangdong.com
   avatar:         images/avatar.jpg
   bio:            "用代码书写这个世界。"
