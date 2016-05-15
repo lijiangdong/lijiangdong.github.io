@@ -4,13 +4,13 @@
 {% if page.tags %}<meta name="keywords" content="{{ page.tags | join: ', ' }}">{% endif %}
 
 <!--关于 twitter-->
-<!--{% if site.owner.twitter or site.twitter %} --><!-- Twitter Cards -->
-<!--
+{% if site.owner.twitter or site.twitter %}<!-- Twitter Cards -->
+
 {% if page.image.feature %}<meta name="twitter:card" content="summary_large_image">
 {% else %}<meta name="twitter:card" content="summary">{% endif %}
 <meta name="twitter:site" content="@{% if site.twitter %}{{ site.twitter }}{% else %}{{ site.owner.twitter }}{% endif %}">
 <meta name="twitter:creator" content="@{% if site.owner.twitter %}{{ site.owner.twitter }}{% else %}{{ site.twitter }}{% endif %}">{% endif %}
--->
+
 <!-- Open Graph -->
 <meta property="og:locale" content="{{ site.locale }}">
 <meta property="og:type" content="article">
@@ -37,7 +37,8 @@
 <!-- For all browsers -->
 <link rel="stylesheet" href="{{ site.url }}/assets/css/main.css">
 <link rel="stylesheet" href="{{ site.url }}/assets/css/jquery.mmenu.all.css">
-<!--<link rel="stylesheet" href="{{ site.url }}/assets/css/jquery.floating-social-share.min.css"> -->
+<!--左侧浮动窗口-->
+<link rel="stylesheet" href="{{ site.url }}/assets/css/jquery.floating-social-share.min.css">
 <!-- Webfonts -->
 <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
 
