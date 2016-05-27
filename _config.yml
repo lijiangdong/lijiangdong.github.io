@@ -1,125 +1,40 @@
-title:            李江东
-description:      Describe your website here.
-# put your disqus here
-disqus_shortname: lijiangdong
-reading_time:     true # if true, shows the estimated reading time for a post
-words_per_minute: 200
-logo:             images/logo.png # logo visible in the topbar
-# Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
-# When testing locally leave blank or use http://localhost:4000
+# Site settings
+title: 李江东
+description: '用代码书写这个世界。'
+#url: 'http://127.0.0.1:4000/'
+url: 'http://lijiangdong.com/'
+baseurl: '/'
+# google_analytics: 'UA-XXXXXX-X'
+# disqus_shortname: 'your-disqus-name'
 
-#url: http://127.0.0.1:4000
-url: http://www.lijiangdong.com
+author:
+  name: '李江东'
+  email: ljd2038@gmail.com
+  twitter_username: lijiangdong
+  facebook_username: lijiangdong
+  github_username:  lijiangdong
+  linkedin_username:  joshgerdes
 
-# draw your top menu here
-# each item must have a title and a url.
-#   To list post categories. use type: 'categories'
-#   To create sub categories. add a submenu item
-# See the example
-menu:
-  - title: 'Home'
-    url: '/'
-  - title: 'Posts'
-    url: '/posts'
-  - title: 'Categories'
-    url: '/categories'
-  - title: 'Tags'
-    url: '/tags'
-  - title: 'CSDN'
-    url: '/blog'
- #   type: 'categories'
- # - title: 'Fork'
- #   url: 'http://github.com/aron-bordin/neo-hpstr-jekyll-theme'
- # - title: 'Install'
- #   url: '/theme-setup/'
- # - title: 'Favorites'
- #   url: '#'
- # - title: 'About'
- #  url: '/about'
+defaults:
+  -
+    scope:
+      path: ''
+      type: 'posts'
+    values:
+        layout: 'post'
 
-# Owner/author information
-owner:
-  id:             无嘴小呆子
-  name:           Li Jiangdong
-
-  site:           http://www.lijiangdong.com
-  avatar:         images/avatar.jpg
-  bio:            "用代码书写这个世界。"
-  email:          ljd2038@gmail.com
-  # Weibo nick for use in Twitter cards and follow button.
-  weibo: lijiangdong # if no weibo in this config, the weibo follow button will be removed
-  # GitHub nick for use in follow button in author block.
-  github: lijiangdong
-
-
-# Social networking links used in author block underneath posts. Update and remove as you like.
-social:
-  - title: "github"
-    url: "https://github.com/lijiangdong"
-
-  - title: "weibo"
-    url: "http://weibo.com/u/3257022505"
-
-  - title: "envelope"
-    url: "mailto:ljd2038@gmail.com"
-#  - title: "linkedin"
-#    url: "https://br.linkedin.com/in/aronbordin"
-#  - title: "youtube"
-#    url: "https://www.youtube.com/channel/UCfnSek-9HPWOx5e2pH7VFgg"
-# Background image to be tiled on all pages
-background:
-
-# Analytics and webmaster tools stuff goes here
-google_analytics:
-google_verify:
-# https://ssl.bing.com/webmaster/configure/verify/ownership Option 2 content= goes here
-bing_verify:
-
-# http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-timezone:    Asia/Shanghai
-locale:      en_US
-future:      true
-highlighter: rouge
-markdown:    kramdown
-gems:
-  - jekyll-sitemap
-sass:
-  sass_dir: _sass
-  style: compressed
-
-# https://github.com/mojombo/jekyll/wiki/Permalinks
-permalink:   /:categories/:title/
-
-# Amount of post to show on home page
+# Build settings
+destination: _site
 paginate: 10
-
-# if true, shows the floatting share buttons
-float_share: false
+permalink: /:year/:title/
+markdown: kramdown
+highlighter: rouge
 
 kramdown:
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..6
-  enable_coderay: true
+  # use Github Flavored Markdown
+  input: GFM
+  # do not replace newlines by <br>s
+  hard_wrap: false
 
-  coderay:
-    coderay_line_numbers: nil
-    coderay_line_numbers_start: 1
-    coderay_tab_width: 4
-    coderay_bold_every: 10
-    coderay_css: class
-
-# Octopress
-# Default extensions
-post_ext: md
-page_ext: md
-# Found in _templates/
-post_layout: post
-page_layout: page
-# Format titles with titlecase?
-titlecase: true
-
-include: [".htaccess"]
-exclude: ["lib", "config.rb", "Capfile", "config", "Gemfile", "Gemfile.lock", "README.md", "LICENSE", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules"]
-gems: [jekyll-paginate]
+gems: ['jekyll-paginate']
+exclude: ['README.md', 'Gemfile', 'Gemfile.lock', 'screenshot.png']
