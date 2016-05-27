@@ -17,8 +17,9 @@ html, body {background: #181818; font-family: 'Lato', helvetica, arial, sans-ser
 
 p {
 	font-size: 1em;
-	line-height: 1.4em;
+	line-height: 1.5em;
 	margin-bottom: 20px;
+	margin-top: 20px;
 	color: #444;
 }
 
