@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Joe Bloggs - Curriculum Vitae</title>
+<title>李江东的简历</title>
 
 <meta name="viewport" content="width=device-width"/>
 <meta name="description" content="The Curriculum Vitae of Joe Bloggs."/>
@@ -25,8 +25,8 @@
 		
 		<div id="contactDetails" class="quickFade delayFour">
 			<ul>
-				<li>e: <a href="mailto:ljd2038@gmail.com" target="_blank">ljd2038@gmail.com</a></li>
-				<li>w: <a href="http://www.bloggs.com">http://blog.csdn.net/ljd2038</a></li>
+				<li>e: ljd2038@gmail.com</li>
+				<li>w: <a href="http://blog.csdn.net/ljd2038" target="_blank">http://blog.csdn.net/ljd2038</a></li>
 				<li>m: 17802175051</li>
 			</ul>
 		</div>
@@ -37,7 +37,7 @@
 		<section>
 			<article>
 				<div class="sectionTitle">
-					<h1>Personal Profile</h1>
+					<h1>个人简介</h1>
 				</div>
 				
 				<div class="sectionContent">
@@ -51,15 +51,25 @@
 		<section>
 			<div class="sectionTitle">
 				<h1>工作经验</h1>
-				<h2>万达信息股份有限公司</h2>
-				<p class="subDetails">2014.11 - 至今</p>
+				<h2></h2>
+				<p class="subDetails">万达信息股份有限公司<br>(2014.11 - 至今)</p>
 			</div>
 			
 			<div class="sectionContent">
 				<article>
 					<h2>项目一：移动服务平台</h2>
-					<h4>项目简介：</h4>
-					<p>这是一款针对公司内部使用的移动办公OA ，包含领导对报销、用印的审批，员工通过app来进行HR组织培训报名,请假,签到等，并且通过二维码扫描完成签到。自己独自负责Android版app开发，负责这款app最初的架构设计，个人完成90%以上的功能实现。（由于登录限制，可在面试时提供app展示）</p>
+					<p>这是一款针对公司内部使用的移动办公OA ，包含领导对报销、用印的审批，员工通过app来进行HR组织培训报名,请假,签到等，并且通过二维码扫描完成签到。自己独自负责Android版app开发，负责这款app最初的架构设计，个人完成90%以上的功能实现。该项目主要技术如下所示：</p>
+					<p>
+						<ol>
+							<li>项目采用Hybrid开发模式，使用MVP架构，通过Dagger2实现层次之间的解耦</li>
+							<li>采用RxJava与RxAndroid来实现异步操作，并且使用线程池管理项目中的子线程</li>
+							<li>采用RxJava与Retrofit进行对后台请求，并且通过fastjson解析后台数据</li>
+							<li>采用ViewPage，Fragment，TabLayout实现各个模块主页的UI设计</li>
+							<li>采用sqlite数据库并使用Ormlite框架实现数据本地缓</li>
+							<li>采用ProGuard对项目进行混淆优化处理</li>
+							<li>采用Butterknife完成控件的绑定，Listview，RecyclerView，WebView等控件进行数据的加载显示，ultra-ptr实现下拉刷新功能，fresco实现图片的异步加载,EventBus实现组件间的通信，multidex解决方法越界</li>
+						</ol>
+					</p>
 				</article>
 			</div>
 			<div class="clear"></div>
@@ -68,12 +78,28 @@
 		
 		<section>
 			<div class="sectionTitle">
-				<h1>Key Skills</h1>
+				<h1>主要技能</h1>
 			</div>
 			
 			<div class="sectionContent">
 			<p>
-				<ul>
+				<ul class="keySkills">
+				<li>Java</li>
+				<li>Linux</li>
+				<li>Gradle</li>
+				<li>View</li>
+				<li>Sqlite</li>
+				<li>Realm</li>
+				<li>RxJava</li>
+				<li>RxAxndroid</li>
+				<li>Retrofit</li>
+				<li>Dagger2</li>
+				<li>IPC</li>
+				<li>Svn</li>
+				<li>GitHub</li>
+				<li>MVP</li>
+				<li>Clean</li>
+				<!--
 					<li>熟悉Java,具有良好的编码风格;</li>
 					<li>熟悉常用的数据结构及算法</li>
 					<li>熟悉Linux操作系统以及常用命令，并且能够独立在Linux环境下开发</li>
@@ -87,6 +113,7 @@
 					<li>熟悉webView与Js之间的交互</li>
 					<li>熟悉App的打包，签名，发布流程</li>
 					<li>熟悉svn,git,gitHub等版本控制器的使用</li>
+					-->
 				</ul>
 				</p>
 			</div>
@@ -96,19 +123,13 @@
 		
 		<section>
 			<div class="sectionTitle">
-				<h1>Education</h1>
+				<h1>教育经历</h1>
 			</div>
 			
 			<div class="sectionContent">
 				<article>
-					<h2>College/University</h2>
-					<p class="subDetails">Qualification</p>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies massa et erat luctus hendrerit. Curabitur non consequat enim.</p>
-				</article>
-				
-				<article>
-					<h2>College/University</h2>
-					<p class="subDetails">Qualification</p>
+					<h2>中原工学院</h2>
+					<p class="subDetails">2011.9-2015.6</p>
 					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies massa et erat luctus hendrerit. Curabitur non consequat enim.</p>
 				</article>
 			</div>
