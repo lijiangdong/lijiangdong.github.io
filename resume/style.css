@@ -139,7 +139,8 @@ section:last-child {
 .subDetails {
 	font-size: 0.8em;
 	font-style: italic;
-	margin-bottom: 3px;
+	margin-bottom: 20px;
+	/*margin-bottom: 3px;*/
 }
 .myInfo {
 	line-height: 1.6em;
