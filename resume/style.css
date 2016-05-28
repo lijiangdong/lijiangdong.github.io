@@ -39,14 +39,16 @@ p {
 #name h1 {
 	font-size: 2.5em;
 	font-weight: 700;
-	font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+	font-family: 黑体
+	/*font-family: 'Rokkitt', Helvetica, Arial, sans-serif;*/
 	margin-bottom: -6px;
 }
 
 #name h2 {
+	font-family: 黑体
 	font-size: 2em;
 	margin-left: 2px;
-	font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+	/*font-family: 'Rokkitt', Helvetica, Arial, sans-serif;*/
 }
 
 #mainArea {
