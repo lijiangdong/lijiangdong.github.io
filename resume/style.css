@@ -125,7 +125,7 @@ section:last-child {
 
 .sectionTitle h1 {
 	font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
-	font-style: italic;
+	/*font-style: italic;*/
 	font-size: 1.5em;
 	color: #cf8a05;
 }
