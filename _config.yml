@@ -11,10 +11,11 @@ blog_url: '/blog'
 author:
   name: '李江东'
   email: ljd2038@gmail.com
-  twitter_username:
-  facebook_username:
+  twitter_username: lijiangdong
+  facebook_username: lijiangdong
   github_username:  lijiangdong
   linkedin_username:
+  google_plus_username: lijiangdong
   weibo_id: 3257022505 
 
 defaults:
