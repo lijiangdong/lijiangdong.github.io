@@ -3,7 +3,7 @@
   
     
     <url>
-      <loc>http://127.0.0.1:4000//2016/welcome-to-jekyll/</loc>
+      <loc>http://127.0.0.1:4000/2016/welcome-to-jekyll/</loc>
       
         <lastmod>2016-01-08T23:04:23+08:00</lastmod>
       
@@ -19,24 +19,9 @@
   
     
     <url>
-      <loc>http://127.0.0.1:4000//categories/</loc>
+      <loc>http://127.0.0.1:4000/categories/</loc>
       
-        <lastmod>2016-05-28T09:23:04+08:00</lastmod>
-      
-      
-        <changefreq>monthly</changefreq>
-      
-      
-        <priority>0.3</priority>
-      
-    </url>
-    
-  
-    
-    <url>
-      <loc>http://127.0.0.1:4000//feed.xml</loc>
-      
-        <lastmod>2016-05-28T09:23:04+08:00</lastmod>
+        <lastmod>2016-05-28T11:04:31+08:00</lastmod>
       
       
         <changefreq>monthly</changefreq>
@@ -49,9 +34,9 @@
   
     
     <url>
-      <loc>http://127.0.0.1:4000//</loc>
+      <loc>http://127.0.0.1:4000/feed.xml</loc>
       
-        <lastmod>2016-05-28T09:23:04+08:00</lastmod>
+        <lastmod>2016-05-28T11:04:31+08:00</lastmod>
       
       
         <changefreq>monthly</changefreq>
@@ -64,9 +49,24 @@
   
     
     <url>
-      <loc>http://127.0.0.1:4000//js/main.js</loc>
+      <loc>http://127.0.0.1:4000/</loc>
       
-        <lastmod>2016-05-28T09:23:04+08:00</lastmod>
+        <lastmod>2016-05-28T11:04:31+08:00</lastmod>
+      
+      
+        <changefreq>monthly</changefreq>
+      
+      
+        <priority>0.3</priority>
+      
+    </url>
+    
+  
+    
+    <url>
+      <loc>http://127.0.0.1:4000/js/main.js</loc>
+      
+        <lastmod>2016-05-28T11:04:31+08:00</lastmod>
       
       
         <changefreq>monthly</changefreq>
@@ -81,9 +81,9 @@
   
     
     <url>
-      <loc>http://127.0.0.1:4000//tags/</loc>
+      <loc>http://127.0.0.1:4000/tags/</loc>
       
-        <lastmod>2016-05-28T09:23:04+08:00</lastmod>
+        <lastmod>2016-05-28T11:04:31+08:00</lastmod>
       
       
         <changefreq>monthly</changefreq>
