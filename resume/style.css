@@ -115,12 +115,12 @@ section:last-child {
 
 .sectionTitle {
 	float: left;
-	width: 25%;
+	width: 20%;
 }
 
 .sectionContent {
 	float: right;
-	width: 72.5%;
+	width: 78%;
 }
 
 .sectionTitle h1 {
@@ -181,7 +181,7 @@ section:last-child {
 .keySkills ul li {
 	margin-bottom: 3px;
 }
-
+/*
 @media all and (min-width: 602px) and (max-width: 800px) {
 	#headshot {
 		display: none;
@@ -204,13 +204,13 @@ section:last-child {
 	#headshot {
 		display: none;
 	}
-/*	
+	
 	#name, #contactDetails {
 		float: none;
 		width: 100%;
 		text-align: center;
 	}
-*/	
+	
 	.sectionTitle, .sectionContent {
 		float: none;
 		width: 100%;
@@ -227,7 +227,7 @@ section:last-child {
 		column-count:1;
 	}
 }
-
+*/
 @media all and (max-width: 480px) {
 	.mainDetails {
 		padding: 15px 15px;
