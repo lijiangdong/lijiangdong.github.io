@@ -67,16 +67,6 @@
               </li>
             {% endif %}
 
-            {% if site.author.facebook_username %}
-              <!-- Facebook -->
-              <li class="navigation__item">
-                <a href="http://fb.me/{{ site.author.facebook_username }}" title="{{ site.author.facebook_username }} on Facebook" target="_blank">
-                  <i class="fa fa-2x fa-facebook-square"></i>
-                  <span class="label">Facebook</span>
-                </a>
-              </li>
-            {% endif %}
-
             {% if site.author.google_plus_username %}
               <!-- Google + -->
               <li class="navigation__item">
@@ -84,6 +74,16 @@
                 <a href="https://plus.google.com/u/0/102424290831566765584/posts" title="{{ site.author.google_plus_username }} on Google +" target="_blank">
                   <i class="fa fa-2x fa-google-plus"></i>
                   <span class="label">Google +</span>
+                </a>
+              </li>
+            {% endif %}
+            
+            {% if site.author.facebook_username %}
+              <!-- Facebook -->
+              <li class="navigation__item">
+                <a href="http://fb.me/{{ site.author.facebook_username }}" title="{{ site.author.facebook_username }} on Facebook" target="_blank">
+                  <i class="fa fa-2x fa-facebook-square"></i>
+                  <span class="label">Facebook</span>
                 </a>
               </li>
             {% endif %}
