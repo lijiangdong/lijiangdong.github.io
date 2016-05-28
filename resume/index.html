@@ -4,10 +4,11 @@
 <title>李江东的简历</title>
 
 <meta name="viewport" content="width=device-width"/>
-<meta name="description" content="The Curriculum Vitae of Joe Bloggs."/>
+<meta name="description" content="Android开发工程师"/>
 <meta charset="UTF-8"> 
 
 <link type="text/css" rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <link href='http://fonts.googleapis.com/css?family=Rokkitt:400,700|Lato:400,300' rel='stylesheet' type='text/css'>
 
 <!--[if lt IE 9]>
@@ -17,7 +18,7 @@
 <body id="top">
 <div id="cv" class="instaFade">
 	<div class="mainDetails">
-		
+
 		<div id="name">
 			<h1 class="quickFade delayTwo">李江东</h1>
 			<h2 class="quickFade delayThree">Android开发工程师</h2>
@@ -25,9 +26,11 @@
 		
 		<div id="contactDetails" class="quickFade delayFour">
 			<ul>
-				<li>e: ljd2038@gmail.com</li>
-				<li>w: <a href="http://blog.csdn.net/ljd2038" target="_blank">http://blog.csdn.net/ljd2038</a></li>
-				<li>m: 17802175051</li>
+				<li><i class="fa fa fa-phone-square"></i>&nbsp&nbsp17802175051</li>
+				<li><i class="fa fa-envelope-square"></i>&nbsp&nbspljd2038@gmail.com</li>
+				<li><a href="http://blog.csdn.net/ljd2038" target="_blank"><i class="fa fa-tags"></i>&nbsp&nbsphttp://blog.csdn.net/ljd2038</a>
+				<li><a href="http://github.com/lijiangdong" target="_blank"><i class="fa fa-github-square"></i>&nbsp&nbsphttp://github.com/lijiangdong</a>
+				</li>
 			</ul>
 		</div>
 		<div class="clear"></div>
@@ -37,11 +40,11 @@
 		<section>
 			<article>
 				<div class="sectionTitle">
-					<h1>个人简介</h1>
+					<h1>个人信息</h1>
 				</div>
 				
 				<div class="sectionContent">
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dolor metus, interdum at scelerisque in, porta at lacus. Maecenas dapibus luctus cursus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies massa et erat luctus hendrerit. Curabitur non consequat enim. Vestibulum bibendum mattis dignissim. Proin id sapien quis libero interdum porttitor.</p>
+					
 				</div>
 			</article>
 			<div class="clear"></div>
@@ -51,8 +54,8 @@
 		<section>
 			<div class="sectionTitle">
 				<h1>工作经验</h1>
-				<h2></h2>
-				<p class="subDetails">万达信息股份有限公司<br>(2014.11 - 至今)</p>
+				<h2>万达信息股份有限公司(2014.11 - 至今)</h2><br>
+				
 			</div>
 			
 			<div class="sectionContent">
@@ -60,7 +63,22 @@
 					<h2>项目一：移动服务平台</h2>
 					<p>这是一款针对公司内部使用的移动办公OA ，包含领导对报销、用印的审批，员工通过app来进行HR组织培训报名,请假,签到等，并且通过二维码扫描完成签到。自己独自负责Android版app开发，负责这款app最初的架构设计，个人完成90%以上的功能实现。该项目主要技术如下所示：</p>
 					<p>
-						<ol>
+						<ol class="projectSkills">
+							<li>项目采用Hybrid开发模式，使用MVP架构，通过Dagger2实现层次之间的解耦</li>
+							<li>采用RxJava与RxAndroid来实现异步操作，并且使用线程池管理项目中的子线程</li>
+							<li>采用RxJava与Retrofit进行对后台请求，并且通过fastjson解析后台数据</li>
+							<li>采用ViewPage，Fragment，TabLayout实现各个模块主页的UI设计</li>
+							<li>采用sqlite数据库并使用Ormlite框架实现数据本地缓</li>
+							<li>采用ProGuard对项目进行混淆优化处理</li>
+							<li>采用Butterknife完成控件的绑定，Listview，RecyclerView，WebView等控件进行数据的加载显示，ultra-ptr实现下拉刷新功能，fresco实现图片的异步加载,EventBus实现组件间的通信，multidex解决方法越界</li>
+						</ol>
+					</p>
+				</article>
+				<article>
+					<h2>项目二：移动服务平台</h2>
+					<p>这是一款针对公司内部使用的移动办公OA ，包含领导对报销、用印的审批，员工通过app来进行HR组织培训报名,请假,签到等，并且通过二维码扫描完成签到。自己独自负责Android版app开发，负责这款app最初的架构设计，个人完成90%以上的功能实现。该项目主要技术如下所示：</p>
+					<p>
+						<ol class="projectSkills">
 							<li>项目采用Hybrid开发模式，使用MVP架构，通过Dagger2实现层次之间的解耦</li>
 							<li>采用RxJava与RxAndroid来实现异步操作，并且使用线程池管理项目中的子线程</li>
 							<li>采用RxJava与Retrofit进行对后台请求，并且通过fastjson解析后台数据</li>
@@ -84,7 +102,7 @@
 			<div class="sectionContent">
 			<p>
 				<ul class="keySkills">
-				<li>Java</li>
+				<!--<li>Java</li>
 				<li>Linux</li>
 				<li>Gradle</li>
 				<li>View</li>
@@ -98,22 +116,20 @@
 				<li>Svn</li>
 				<li>GitHub</li>
 				<li>MVP</li>
-				<li>Clean</li>
-				<!--
-					<li>熟悉Java,具有良好的编码风格;</li>
-					<li>熟悉常用的数据结构及算法</li>
+				<li>Clean</li>-->
+				
+					<li>熟悉掌握Java；掌握常用的数据结构，并具有良好的编码风格；</li>
 					<li>熟悉Linux操作系统以及常用命令，并且能够独立在Linux环境下开发</li>
-					<li>熟悉AndroidStudio与Gradle</li>
+					<li>熟悉AndroidStudio、Gradle等开发工具的使用，掌握Svn，Git版本管理，有团队协作经验</li>
 					<li>熟悉Android SDK以及实现原理</li>
 					<li>熟悉Android布局，View的事件分发与绘制流程</li>
 					<li>熟悉sqlite,realm移动端数据库以及ormlite，greenDao开源框架</li>
 					<li>熟悉mvp，mvc，clean架构以及软件开发中solid原则与常用设计模式</li>
-					<li>熟悉RxJava，RxAndroid，Dagger2,Retrofit，Eventbus等常用开源框架</li>
+					<li>熟悉RxJava,RxAndroid,Dagger2,Retrofit,Eventbus等常用开源框架并对部分框架源码有一定了解</li>
 					<li>熟悉Android的IPC机制，多线程以及消息机制</li>
 					<li>熟悉webView与Js之间的交互</li>
 					<li>熟悉App的打包，签名，发布流程</li>
-					<li>熟悉svn,git,gitHub等版本控制器的使用</li>
-					-->
+					
 				</ul>
 				</p>
 			</div>
@@ -129,8 +145,24 @@
 			<div class="sectionContent">
 				<article>
 					<h2>中原工学院</h2>
-					<p class="subDetails">2011.9-2015.6</p>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies massa et erat luctus hendrerit. Curabitur non consequat enim.</p>
+					<p class="subDetails">2011.9-2015.6/本科/计算机科学与技术</p>
+				</article>
+			</div>
+			<div class="clear"></div>
+		</section>
+
+		<section>
+			<div class="sectionTitle">
+				<h1>文章精选</h1>
+			</div>
+			
+			<div class="sectionContent">
+				<article>
+				<div>
+				<a href="http://blog.csdn.net/ljd2038/article/details/51477475">Android官方MVP架构解读</a><br>
+				<a href="http://blog.csdn.net/ljd2038/article/details/51278508">Java中的线程池</a>			
+				</div>
+
 				</article>
 			</div>
 			<div class="clear"></div>
