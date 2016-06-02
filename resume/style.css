@@ -207,6 +207,7 @@ section:last-child {
 		display: none;
 	}
 	
+	
 	#name, #contactDetails {
 		float: none;
 		width: 100%;
@@ -229,7 +230,7 @@ section:last-child {
 		column-count:1;
 	}
 }
-*/
+
 @media all and (max-width: 480px) {
 	.mainDetails {
 		padding: 15px 15px;
@@ -255,10 +256,14 @@ section:last-child {
 		margin-bottom: 4px;
 	}
 }
-
+*/
 @media print {
     #cv {
         width: 100%;
+    }
+
+    #second-page, #third-page1,#third-page2{
+    	margin-top: 60px;
     }
 }
 
