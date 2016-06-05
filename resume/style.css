@@ -183,6 +183,10 @@ section:last-child {
 .keySkills ul li {
 	margin-bottom: 3px;
 }
+
+.print-br {
+	display: none;
+}
 /*
 @media all and (min-width: 602px) and (max-width: 800px) {
 	#headshot {
@@ -265,6 +269,10 @@ section:last-child {
     #second-page, #third-page1,#third-page2{
     	margin-top: 60px;
     }
+
+    .print-br {
+	display: block;
+	}
 }
 
 @-webkit-keyframes reset {
