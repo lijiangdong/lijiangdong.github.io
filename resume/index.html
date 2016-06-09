@@ -29,8 +29,8 @@
 				<li><i class="fa fa-home"></i>&nbsp&nbsp上海市闵行区</li>
 				<li><i class="fa fa-phone-square"></i>&nbsp&nbsp17802175051</li>
 				<li><a href="mailto:ljd2038@163.com"><i class="fa fa-envelope-square"></i>&nbsp&nbspljd2038@163.com</a></li>
-			<!--	<li><a href="http://github.com/lijiangdong" target="_blank"><i class="fa fa-github-square"></i>&nbsp&nbsphttp://github.com/lijiangdong</a>  
-				</li>-->
+				<li><a href="http://github.com/lijiangdong" target="_blank"><i class="fa fa-github-square"></i>&nbsp&nbsphttp://github.com/lijiangdong</a>  
+				</li>
 				<li><a href="http://blog.csdn.net/ljd2038" target="_blank"><i class="fa fa-tags"></i>&nbsphttp://blog.csdn.net/ljd2038</a>
 				<li>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(CSDN博客专家)</li>
 			</ul>
@@ -69,22 +69,25 @@
 				<article>
 					<h2>移动服务平台（2015.7-至今）</h2>
 					<p>
-					　　一款针对万达信息内部使用的移动办公OA。这款APP主要用于公司内部的审批与培训。使用AndroidStudio并独自负责Android版的APP开发，完成这款APP最初的架构设计，以及90%以上的功能实现。在15年11月份正式投入全公司使用，之后经过5个版本迭代添加与完善其功能（由于账号登录限制，可在面试时提供APP展示）。该项目所采用的主要技术如下所示：</p>
+					　　一款针对万达信息内部使用的移动办公OA。这款APP主要用于公司内部的审批与培训。使用AndroidStudio并独自负责Android版的APP开发与维护，完成这款APP最初的架构设计，以及90%以上的功能实现。在15年11月份正式投入全公司使用，并获得公司内部员工一致好评。之后经过4个版本迭代，添加与完善其功能。在第二个版本中对APP进行瘦身和混淆处理，使得APK体积减小5M，并且对Android6.0系统进行兼容。今年5月培训功能正式上线，获的公司员工的认可。该项目所采用的主要技术如下所示：
+					</p>
+
 					<p>
 						<ol class="projectSkills">
 							<li>项目整体采用混合开发模式，使用MVP架构并通过Dagger2实现层次之间的解耦</li>
 							<li>采用RxJava与RxAndroid来实现异步操作，并且使用线程池管理项目中的子线程</li>
 							<li>采用RxJava与Retrofit进行对后台请求，并且通过FastJson解析后台数据</li>
 							<li>采用ViewPage，Fragment，TabLayout实现各个模块主页的UI设计</li>
-							<li>采用WebView对审批单据的加载并与本地方法进行交互完成审批过程</li>
 							<div class="print-br">
 							<br>
 							<br>
-							<br>  								
+														
 							</div>
+							<li>采用WebView对审批单据的加载并与本地方法进行交互完成审批过程</li>
 							<li>采用Realm数据库完成数据的本地缓存，并对数据库加密保证本地数据的安全性</li>							
 							<li>采用ProGuard对项目进行混淆优化处理</li>
-							<li>采用ButterKnife完成控件的绑定，极光推送完成消息推送通知，ZXing实现二维码扫描签到，<!--Listview，RecyclerView，WebView等控件进行数据的加载显示，-->Ultra-Ptr实现下拉刷新功能，Fresco实现图片的异步加载与缓存,EventBus实现组件间的通信，Multidex解决方法数越界</li>
+							<li>通过百度地图的定位实现培训的签到功能</li>
+							<li>采用ButterKnife完成控件的绑定，极光推送完成消息推送通知，<!--Listview，RecyclerView，WebView等控件进行数据的加载显示，-->Ultra-Ptr实现下拉刷新功能，Fresco实现图片的异步加载与缓存,EventBus实现组件间的通信，Multidex解决方法数越界</li>
 						</ol>
 					</p>
 				</article>
@@ -94,7 +97,7 @@
 				<article>
 					<h2>智慧城管（2014.11-2015.5）</h2>
 					<p>		
-						　　该项目是深圳龙岗区智慧城管便民服务系统，该APP实现对公园、公厕、绿道、绿化、垃圾转运站等信息的采集，通过GPS技术标出目标位置同时录入文字信息、现场拍照上传到服务器存档。这个项目是在万达信息实习时所参与开发，在该项目中我负责公园、绿道和公共自行车的信息查询，以及采集数据的上传功能。在我负责的功能中所采用技术如下所示：
+						　　该项目是深圳龙岗区智慧城管便民服务系统，该APP实现对公园、公厕、绿道、绿化、垃圾转运站等信息的采集，通过GPS技术标出目标位置同时录入文字信息、现场拍照上传到服务器存档。在该项目中我负责公园、绿道和公共自行车的信息查询，以及采集数据的上传功能。在我负责的功能中所采用技术如下所示：
 						<ol class="projectSkills">
 						<li>通过BroadcastReceiver监听网络的变化，并在网络连接时可以通过Service自动将数据传到服务器</li>
 						<li>采用android-async-http进行网络请求并通过FastJson解析Json数据</li>
@@ -102,11 +105,6 @@
 						<li>采用Sqlite数据库并使用Greendao框架实现数据本地存储查询</li>
 						<li>使用百度地图实现对街道位置的导航功能以及对位置信息的采集</li>
 						<li>通过Spinner，Fragment，ListView实现公园、绿道的查询显示界面，并通过ButterKnife实现View的绑定，使用Picasso完成对图片的加载与缓存</li>
-						</ol>
-					</p>
-					<p>
-						<ol class="projectSkills">
-						
 						</ol>
 					</p>
 				</article>
@@ -159,7 +157,7 @@
 			</div>
 			<div class="clear"></div>
 		</section>
-
+<!--
 		<section>
 			<div class="sectionTitle">
 				<h1>文章精选</h1>
@@ -175,7 +173,7 @@
 				</article>
 			</div>
 			<div class="clear"></div>
-		</section>
+		</section>       -->
 
 		<section>
 			<article>
@@ -185,7 +183,7 @@
 				
 				<div class="sectionContent">
 				<p style="margin-top: 0px">
-					　　在工作中能够适应较大压力，能够独自担当APP的开发工作。在技术上勇于创新，相互学习并乐于分享自己的技术。在生活中喜欢阅读，例如通过对包建强的《APP研发录》的阅读使自己对整个APP的开发流程有着深刻的认识，对秦小波的《设计模式之禅》的阅读中对Java设计模式有了更全面的理解。通过理论与实践的相结合，使自己所开发的APP有着更好的用户体验，并增强其维护性。
+					　　互联网从业人员，对移动互联网有着浓厚的兴趣。在工作中能够承受较大压力，能够独自担当APP的开发工作。在技术上勇于创新，相互学习并乐于分享自己的技术。在生活中喜欢阅读，通过理论与实践的相结合，提高APP的质量，使用户能够有着更好的体验。
 				</p>
 				</div>
 			</article>
