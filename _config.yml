@@ -1,8 +1,8 @@
 # Site settings
 title: 李江东
 description: '用代码书写这个世界。'
-#url: 'http://127.0.0.1:4000'
-url: 'http://lijiangdong.com'
+url: 'http://127.0.0.1:4000'
+#url: 'http://lijiangdong.com'
 baseurl: '/'
 blog_url: '/blog'
 # google_analytics: 'UA-XXXXXX-X'
