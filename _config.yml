@@ -17,10 +17,19 @@ permalink: /:year/:month/:day/:title/
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
 
 github_username: lijiangdong
-highlighter: Pygments
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
+linenos: true
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    default_lang: c
+    css_class: 'highlight'
+    line_numbers: false
+    start_line: 1
+    wrap: true
 
 baidu_analysis: 94be4b0f9fc5d94cc0d0415ea6761ae9
 
