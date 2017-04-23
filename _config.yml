@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 李江东
-subtitle:
-description: 用代码书写这个世界。
-author: lijiangdong
+title: 无嘴小呆子。
+subtitle: 用代码书写这个世界。
+description: Android开发工程师
+author: 李江东
 language: zh-Hans
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://lijiangdong.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
