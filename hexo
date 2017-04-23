@@ -1,0 +1,4 @@
+# !bin/shell
+hexo clean
+hexo g
+hexo d
