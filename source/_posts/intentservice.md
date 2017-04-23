@@ -1,11 +1,10 @@
 ---
-title:    IntentService——Handler与Service的结合
+title:    IntentService—Handler与Service的结合
 date: 2016-03-18 13:57
-category: [android]
+category: [Android]
 tags: [IntentService]
 comments: true
 ---
-# **综述**
 　　我们都知道Service是作为后台服务运行再程序中的。但是Service他依然是运行在主线程中的，所以我们依然不能在Service中进行耗时的操作。所以当我们在Service处理时，我们需要在Service中开启一个子线程，并且在子线程中运行。当然为了简化我们的操作，在Android中为我们提供了IntentService来进行这一处理，下面我们就来看一下这个IntentService用法以及它的工作原理。<!--more-->
 # **用法简介**
 　　IntentService它继承自Service，一来说我们开启一个Service可以通过startService和bindService两个方式进行开启一个服务，但是对于IntentService我们采用startService方法进行开启服务，对于为什么要这么做，在后面会进行分析讲解。下面我们来看一下如何使用这个IntentService的。

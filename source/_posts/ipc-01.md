@@ -1,12 +1,11 @@
 ---
 title: Android的IPC机制(一)—AIDL的使用
 date: 2016-02-20 13:54
-category: [android]
+category: [Android]
 tags: [ipc,aidl]
 comments: true
 ---
 
-# **综述**
 　　IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。<!-- more -->
 　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。
 # **AIDL简介**

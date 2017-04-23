@@ -1,11 +1,11 @@
 ---
 title:  Android的IPC机制(三)—Binder连接池
 date: 2016-02-24 20:00
-category: [android]
+category: [Android]
 tags: [ipc,aidl]
 comments: true
 ---
-# **综述**
+
 　　前两篇说到AIDL的使用方法，但是当我们的项目很大时，很多模块都需要用到Service，我们总不能为每一个模块都创建一个Service吧，这样一来我们的应用就会显得很笨重。那么有没有一种解决方案叫我们只需要创建一个Service，然后去管理AIDL呢？在任玉刚的《Android开发艺术探索》中给出了一个解决方案，那就是Binder连接池。在这里我们看一下他是怎么实现的。<!--more-->
 # **Binder连接池的实现**
 　　在前面说到AIDL的使用及原理的时候，我们可以看到在服务端只是创建了一个Binder然后返回给客户端使用而已。于是我们可以想到是不是我们可以只有一个Service,对于不同可客户端我们只是去返回一个不同的Binder即可，这样就避免了创建了大量的Service。在任玉刚的《Android开发艺术探索》给出了一个Binder连接池的概念，很巧妙的避免了Service的多次创建。这个Binder连接池类似于设计模式中的工厂方法模式。为每一个客户端创建他们所需要的Binder对象。那么下面我们看一下它是如何实现的。

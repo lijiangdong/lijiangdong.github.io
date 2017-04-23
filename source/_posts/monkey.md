@@ -1,0 +1,319 @@
+---
+title:  Android稳定性测试工具Monkey的使用
+date: 2016-12-11 16:34
+category: [Android]
+tags: [测试]
+comments: true
+---
+
+　　Monkey是一个命令行工具，它可以运行在我们的模拟器或者设备当中。它可以发送一些伪随机（pseudo-random）的用户事件流，例如点击，触摸，手势等。我们能够使用Monkey工具来对我们所开发的应用进行压力测试。Monkey测试是一种为了测试软件的稳定性，健壮性的快速有效的方法。<!--more-->
+# **Monkey程序介绍**
+　　Monkey是Android自带的系统工具，是由java语言编写。他在Android文件系统存放的路径是：/system/framework/monkey.jar
+启动moneky.jar的shell脚本文件在Android文件系统存放的路径为：/system/bin/monkey。打开这个monkey文件我们可以看一下这个脚本文件很简单。
+```shell
+# Script to start "monkey" on the device, which has a very rudimentary
+# shell.
+#
+base=/system
+export CLASSPATH=$base/framework/monkey.jar
+trap "" HUP
+exec app_process $base/bin com.android.commands.monkey.Monkey $*
+```
+　　我们可以看到他调用的是com.android.commands.monkey.Monkey包。
+# **Monkey常用命令**
+　　下面我们就来执行这个monkey脚本。我们执行如下命令。
+```shell
+adb shell monkey
+```
+　　这时候，monkey将以无反馈模式进行启动，并把事件任意发送到安装在目标环境下中的全部包。运行结果如下所示。
+```shell
+LiJiangdongdeMacBook-Pro:~ lijiangdong$ adb shell monkey
+usage: monkey [-p ALLOWED_PACKAGE [-p ALLOWED_PACKAGE] ...]
+              [-c MAIN_CATEGORY [-c MAIN_CATEGORY] ...]
+              [--ignore-crashes] [--ignore-timeouts]
+              [--ignore-security-exceptions]
+              [--monitor-native-crashes] [--ignore-native-crashes]
+              [--kill-process-after-error] [--hprof]
+              [--pct-touch PERCENT] [--pct-motion PERCENT]
+              [--pct-trackball PERCENT] [--pct-syskeys PERCENT]
+              [--pct-nav PERCENT] [--pct-majornav PERCENT]
+              [--pct-appswitch PERCENT] [--pct-flip PERCENT]
+              [--pct-anyevent PERCENT] [--pct-pinchzoom PERCENT]
+              [--pkg-blacklist-file PACKAGE_BLACKLIST_FILE]
+              [--pkg-whitelist-file PACKAGE_WHITELIST_FILE]
+              [--wait-dbg] [--dbg-no-events]
+              [--setup scriptfile] [-f scriptfile [-f scriptfile] ...]
+              [--port port]
+              [-s SEED] [-v [-v] ...]
+              [--throttle MILLISEC] [--randomize-throttle]
+              [--profile-wait MILLISEC]
+              [--device-sleep-time MILLISEC]
+              [--randomize-script]
+              [--script-log]
+              [--bugreport]
+              [--periodic-bugreport]
+              COUNT
+
+```
+　　这时候可以看到monkey并没有运行起来，只是显示了usage，这是因为少了一个重要的参数<event-count>，这是指发送的事件数。如果我们需要发送500个随机事件，执行如下命令。
+```shell
+adb shell monkey 500
+```
+　　这时候我们可以看到手机已经疯狂的运行起来了。moneky的基本语法为
+```shell
+$ adb shell monkey [options] <event-count>
+```
+　　monkey的option操作都是根据具体需求设定的，主要分为常规类，事件类，约束类和调试类。下面就对这些命令进行说明。
+ 
+<table>
+    <tbody>
+    <tr>
+      <th>Category</th>
+      <th>Option</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+    <td rowspan="2">常规类</td>
+    <td><code>--help</code></td>
+    <td>显示moneky参数帮助信息usage</td>
+    </tr>        
+    <tr>
+    <td><code>-v</code></td>
+    <td>打印日志信息，每个-v将增加反馈信息的级别。-v越多日志信息就会越详细，不过目前最多支持三个-v。Level0：一个-v，除启动提示、测试完成和最终结果之外，提供较少信息。Level1：两个-v，提供较为详细的测试信息，如逐个发送到Activity的事件。Level2：三个-v，提供更加详细的设置信息，如测试中被选中的或未被选中的Activity。</td>
+    </tr>       
+    <tr>
+    <td rowspan="10">事件类</td>
+    <td><code>-s &lt;seed&gt;</code></td>
+    <td>伪随机数生成器的seed值。如果用相同的seed值再次运行 Monkey，它将生成相同的事件序列。</td>
+    </tr>      
+    <tr>
+    <td><code>--throttle &lt;milliseconds&gt;</code></td>
+    <td>后面接时间，单位为毫秒，表示事件之间的固定延时（即执行每一个指令的间隔时间），若不接这个选项，monkey则不会延时</td>
+    </tr>     
+    <tr>
+    <td><code>--pct-touch &lt;percent&gt;</code></td>
+    <td>后面接触摸事件的百分比。(触摸事件是一个down-up事件，它发生在屏幕上的某单一位置)</td>
+    </tr>      
+    <tr>
+    <td><code>--pct-motion &lt;percent&gt;</code></td>
+    <td>后面接动作事件的百分比。(动作事件由屏幕上某处的一个down事件、一系列的伪随机事件和一个up事件组成)。</td>
+    </tr>    
+    <tr>
+    <td><code>--pct-trackball &lt;percent&gt;</code></td>
+    <td>后面接轨迹事件的百分比(轨迹事件由一个或几个随机的移动组成，有时还伴随有点击)。</td>
+    </tr>       
+    <tr>
+    <td><code>--pct-nav &lt;percent&gt;</code></td>
+    <td>后面接“基本”导航事件百分比(导航事件主要来自方向输入设备的上，下，左，右事件)</td>
+    </tr>      
+    <tr>
+    <td><code>--pct-majornav &lt;percent&gt;</code></td>
+    <td>后面接“主要”导航事件的百分比(这些导航事件通常引发图形界面中的动作，如：5-way键盘的中间按键、回退按键、菜单按键)</td>
+    </tr>      
+    <tr>
+    <td><code>--pct-syskeys &lt;percent&gt;</code></td>
+    <td>后面接“系统”按键事件的百分比(这些按键通常被保留，由系统使用，如Home、Back、StartCall、End Call及音量控制键)。</td>
+    </tr>    
+    <tr>
+    <td><code>--pct-appswitch &lt;percent&gt;</code></td>
+    <td>后面接启动Activity的百分比。在随机间隔里，Monkey将执行一个startActivity()调用，作为最大程度覆盖包中全部Activity的一种方法。</td>
+    </tr>     
+    <tr>
+    <td><code>--pct-anyevent &lt;percent&gt;</code></td>
+    <td>调整其它类型事件的百分比。它包罗了所有其它类型的事件，如：按键、其它不常用的设备按钮、等等。</td>
+    </tr>        
+    <tr>
+    <td rowspan="2">约束类</td>
+    <td><code>-p &lt;allowed-package-name&gt;</code></td>
+    <td>如果用此参数指定了一个或几个包，Monkey将只允许系统启动这些包里的Activity。如果你的应用程序还需要访问其它包里的Activity(如选择取一个联系人)，那些包也需要在此同时指定。如果不指定任何包，Monkey将允许系统启动全部包里的Activity。要指定多个包，需要使用多个-p选项，每个-p选项只能用于一个包。</td>
+    </tr>        
+    <tr>
+    <td><code>-c &lt;main-category&gt;</code></td>
+    <td>如果用此参数指定了一个或几个类别，Monkey将只允许系统启动被这些类别中的某个类别列出的Activity。如果不指定任何类别，Monkey将选择下列类别中列出的Activity：Intent.CATEGORY_LAUNCHER或Intent.CATEGORY_MONKEY。要指定多个类别，需要使用多个-c选项，每个-c选项只能用于一个类别。</td>
+    </tr>        
+    <tr>
+    <td rowspan="8">调试类</td>
+    <td><code>--dbg-no-events</code></td>
+    <td>设置此选项，Monkey将执行初始启动，进入到一个测试Activity，然后不会再进一步生成事件。为了得到最佳结果，把它与-v、一个或几个包约束、以及一个保持Monkey运行30秒或更长时间的非零值联合起来，从而提供一个环境，可以监视应用程序所调用的包之间的转换。</td>
+    </tr>        
+    <tr>
+    <td><code>--hprof</code></td>
+    <td>设置此选项，将在Monkey事件序列之前和之后立即生成profiling报告。这将会在data/misc中生成大文件(~5Mb)，所以要小心使用它。</td>
+    </tr>        
+    <tr>
+    <td><code>--ignore-crashes</code></td>
+    <td>通常，当应用程序崩溃或发生任何失控异常时，Monkey将停止运行。如果设置此选项，Monkey将继续向系统发送事件，直到计数完成。</td>
+    </tr>        
+    <tr>
+    <td><code>--ignore-timeouts</code></td>
+    <td>通常，当应用程序发生任何超时错误(如“ApplicationNot Responding”对话框)时，Monkey将停止运行。如果设置此选项，Monkey将继续向系统发送事件，直到计数完成。</td>
+    </tr>        
+    <tr>
+    <td><code>--ignore-security-exceptions</code></td>
+    <td通常，当应用程序发生许可错误(如启动一个需要某些许可的Activity)时，Monkey将停止运行。如果设置了此选项，Monkey将继续向系统发送事件，直到计数完成。</td>
+    </tr>        
+    <tr>
+    <td><code>--kill-process-after-error</code></td>
+    <td>通常，当Monkey由于一个错误而停止时，出错的应用程序将继续处于运行状态。当设置了此选项时，将会通知系统停止发生错误的进程。注意，正常的(成功的)结束，并没有停止启动的进程，设备只是在结束事件之后，简单地保持在最后的状态。</td>
+    </tr>      
+    <tr>
+    <td><code>--monitor-native-crashes</code></td>
+    <td>监视并报告Android系统中本地代码的崩溃事件。如果设置了--kill-process-after-error，系统将停止运行。</td>
+    </tr>        
+    <tr>
+    <td><code>--wait-dbg</code></td>
+    <td>停止执行中的Monkey，直到有调试器和它相连接。</td>
+    </tr>        
+    </tbody>
+</table>
+    
+# **一条常用的Monkey命令**
+```shell
+adb shell monkey -v -v -v -p [PackageName] --ignore-crashes --ignore-timeouts --ignore-security-exceptions --monitor-native-crashes --ignore-native-crashes --throttle 1000 100000 > monkey.txt
+```
+　　执行这条命令后会在当前文件夹下面生成一个名为monkey.txt的日志文件，我们可以通过搜索exception和ANR来找到monkey测试中所出现的Crash和ANR。
+# **停止Monkey**
+　　对于正在运行的monkey应用。如果我们想要停止monkey测试可以如下命令。
+```shell
+$ adb shell
+
+shell@lte26007:/ $ top | grep monkey
+26194  0   0% S    10 461848K  23012K     shell    com.android.commands.monkey
+26194  0   0% S    10 461848K  23012K     shell    com.android.commands.monkey
+26194  0   0% S    10 461848K  23012K     shell    com.android.commands.monkey
+
+$ kill -9 26194 $ kill -9 26194
+```
+　　在这里是通过杀死正在运行的monkey的进程来终止monkey的测试。
+# **如何编写Monkey脚本**
+　　我们了解了一些Monkey的基本命令以后，但这通过这些命令运行Monkey测试所有的事件都是随机的，只会在手机屏幕进行随机点击。那么我们如何使用monkey做到自动填写，选择，提交呢？在这就来看一下如何编一个Monkey脚本。
+## **常用Monkey Api介绍**
+1.启动应用
+```
+LaunchActivity(String pkg_name, String cl_name)
+```
+　　启动应用的Activity。参数为包名和启动的Activity。
+2.轨迹球事件
+```java
+DispatchTrackball(long downTime, long eventTime, int action, float x, float y, float pressure, float size, int metaState, float xPrecision, float yPrecision, int device, int edgeFlags)
+```
+　　这里参数很多，只需要关注action,x,y.对于参数action值为0代表按下（KeyDown）,1代表弹起（KeyUp）。如果使用这个方法实现点击事件，这个方法就应该成对出现，先传入0，然后在传入1。对于x，y就是定位的坐标点。下面列出其中参数含义。
+
+ - long downTime:键最初被按下时间
+ - long eventTime:事件发生时间
+ - int action:动作ACTION_DOWN=0,ACTION_UP=1,ACTION_MULTIPLE=2
+ - float x:x坐标
+ - float y:y坐标
+ - float pressure:当前事件的压力，值为0～1
+ - float size:触摸的近似值，范围为0～1
+ - int metaState:当前按下的meta键的标识
+ - float xPrecision:x坐标精确值
+ - float yPrecision:y坐标精确值
+ - int device:事件来源，范围0～x，0表示不来自物理设备
+ - int edgeFlags:坐标是否超出了屏幕范围
+
+3.输入字符串事件
+```
+DispatchString(String text)
+```
+　　输入一个不加引号的字符串
+4.点击事件
+```
+DispatchPointer(long downTime,  long eventTime, int action, loat x, float y, float pressure, float size, int metaState,  float xPrecision, float yPrecision, int device, int edgeFlags)
+与轨迹球事件类似
+```
+5.等待事件
+```
+UserWait(long sleeptime)
+```
+6.按下事件
+```
+DispatchPress(int keyCode)
+```
+7.单击事件
+```
+Tap(int x,int y) 
+```
+8.长按事件
+```
+LongPress()
+```
+9.发送键值
+```
+DispatchKey(long downTime, long eventTime, int action, int code, int repeat, int metaState, int device, int scancode)
+```
+10.开关软键盘
+```
+DispatchFlip(boolean keyboardOpen)
+```
+## **编写Monkey脚本**
+　　在写Monkey脚本之前首先看一下怎么获取包名和应用名，已经怎么怎么获取点击坐标。
+### **获取包名和应用名**
+1.查看包名
+```shell
+$ adb shell
+# ls data/data
+```
+2.查看应用（主界面）名
+```
+$ adb shell
+# logcat | grep START
+```
+　　以QQ为例看一下输出结果
+```
+LiJiangdongdeMacBook-Pro:~ lijiangdong$ adb shell
+shell@lte26007:/ $ su
+root@lte26007:/ # logcat | grep START
+I/libmc   ( 9161): received event[index:0,mask:0x80,name:SYSTEM_RESTART@1487131192515.txt]
+D/MSF.C.NetConnInfoCenter(18238): receive broadcast Intent { act=android.intent.action.MEDIA_SCANNER_STARTED dat=file:///system/media flg=0x10 cmp=com.tencent.mobileqq/.msf.core.NetConnInfoCenter }
+D/MSF.C.NetConnInfoCenter(18238): receive broadcast Intent { act=android.intent.action.MEDIA_SCANNER_STARTED dat=file:///storage/emulated/0 flg=0x10 cmp=com.tencent.mobileqq/.msf.core.NetConnInfoCenter }
+D/AndroidRuntime(19635): >>>>>> AndroidRuntime START com.android.internal.os.RuntimeInit <<<<<<
+I/ActivityManager(17556): START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.tencent.mobileqq/.activity.SplashActivity bnds=[34,466][170,602]} from pid 17844
+```
+　　从cmp=com.tencent.mobileqq/.activity.SplashActivity这句话可以看出QQ应用的主界面名为SplashActivity。
+### **获取点击坐标**
+```
+$ adb shell getevent
+```
+　　之后我们手指在屏幕上操作就可以看到输出的事件信息。下面看一下输入信息。
+```
+/dev/input/event1: 0003 0039 00003809
+/dev/input/event1: 0003 0035 00000172
+/dev/input/event1: 0003 0036 000002aa
+/dev/input/event1: 0001 014a 00000001
+/dev/input/event1: 0000 0000 00000000
+/dev/input/event1: 0003 0039 ffffffff
+/dev/input/event1: 0001 014a 00000000
+/dev/input/event1: 0000 0000 00000000
+   (DeviceName)  (Type)(Code)(Value)
+```
+　　当Code出现0030和0032时，表示有触屏事件发生，而0035和0036出现时则代表实际触屏时的绝对坐标x，y。比如这里点172和2aa，这个是16进制，对应10进制为370和682。
+### **Monkey脚本**
+　　上面api明白以后Monkey脚本的编写就很简单了，下面就以QQ为列变了一段monkey脚本。对于头文件是必须的。Monkey脚本是没有文件格式限制的。
+```shell
+#头文件信息  
+type=raw events  
+count=10  
+speed=1.0  
+start data >>  
+
+#具体的脚本内容  
+LaunchActivity(com.tencent.mobileqq,com.tencent.mobileqq.activity.SplashActivity)  
+UserWait(1000)  
+DispatchPointer(10,10,0,165,189,1,1,-1,1,1,0,0)
+DispatchPointer(10,10,1,165,189,1,1,-1,1,1,0,0)
+UserWait(1000)  
+DispatchString(1234567)  
+DispatchFlip(false)  
+UserWait(5000)
+Tap(359,257)
+```
+　　上面这段脚本执行的命令是：启动QQ->点击搜索->输入1234567->点击QQ号为1234567的人。下面就来看一下如何执行这段脚本代码。
+```
+$ adb push monkey_test /mnt/sdcard/
+$ adb shell monkey -f /mnt/sdcard/monkey_test 1
+```
+# **总结**
+　　在这里介绍了Monkey的使用，对于我们的应用通过monkey进行压力测试，也能够发现众多的ANR以及Crash。对于Monkey也有一定缺点的，它是不支持截屏，录制回放等操作的。
+# **附录**
+[Monkey源码](https://github.com/android/platform_development/tree/master/cmds/monkey)

@@ -1,0 +1,472 @@
+---
+title: ProGuard详解
+date: 2016-05-03 23:46
+category: [Android]
+tags: [ProGuard,性能优化]
+comments: true
+---
+　　对于ProGuard工具想必我们都不陌生，它能够通过移除无用代码，使用简短无意义的名称来重命名类，字段和方法。从而能够达到压缩、优化和混淆代码的目的。最终我们会获取一个较小的apk文件，并且我们这个通过ProGuard处理的apk文件更难于进行逆向工程。<!--more-->
+# **ProGuard工作原理简介**
+　　ProGuard能够对Java类中的代码进行压缩（Shrink）,优化（Optimize）,混淆（Obfuscate）,预检（Preveirfy）。
+　　1. 压缩（Shrink）:在压缩处理这一步中，用于检测和删除没有使用的类，字段，方法和属性。
+　　2. 优化（Optimize）:在优化处理这一步中，对字节码进行优化，并且移除无用指令。
+　　3. 混淆（Obfuscate）:在混淆处理这一步中，使用a,b,c等无意义的名称，对类，字段和方法进行重命名。
+　　4. 预检（Preveirfy）:在预检这一步中，主要是在Java平台上对处理后的代码进行预检。
+　　对于ProGuard执行流程图如下图所示。
+　　![这里写图片描述](http://img.blog.csdn.net/20160503154622567)
+　　对于ProGuard的原理更详细的介绍可以参考[Proguard手册](https://stuff.mit.edu/afs/sipb/project/android/sdk/android-sdk-linux/tools/proguard/docs/index.html#manual/introduction.html)，在这里就不在进行更详细的介绍。
+# **ProGuard使用**
+　　ProGuard已集成到Android构建系统中，所以我们不用手动调用这个工具。我们可以选择在只发布模式下构建系统的时候再去运行ProGuard。
+　　在AndroidStudio中我们需要将Proguard添加到gradle.build文件的构建类型当中。不过在我们创建一个Android工程的时候，系统已经自动为我们添加到了gradle.build中。
+```java
+buildTypes {
+    release {
+        minifyEnabled true
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+}
+```
+**minifyEnabled**:开启混淆,我们新建的工程默认为false，因此，如果我们需要开启混淆的话就需要手动设为true。
+**proguardFiles**:这部分有两段，前一段代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，免去了我们很多事，这个文件的目录在**/tools/proguard/proguard-android.txt** , 后一部分是我们项目里的自定义的混淆文件，目录就在 **app/proguard-rules.pro**,在这个文件里我们可以声明一些我们所需要的定制的混淆规则。
+　　下面我们就来看一下这个默认的android程序混淆文件proguard-android.txt。对于下面一些指令与代码的含义在后面会进行说明。
+```bash
+# This is a configuration file for ProGuard.
+# http://proguard.sourceforge.net/index.html#manual/usage.html
+
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose
+
+# Optimization is turned off by default. Dex does not like code run
+# through the ProGuard optimize and preverify steps (and performs some
+# of these optimizations on its own).
+-dontoptimize
+-dontpreverify
+# Note that if you want to enable optimization, you cannot just
+# include optimization flags in your own project configuration file;
+# instead you will need to point to the
+# "proguard-android-optimize.txt" file instead of this one from your
+# project.properties file.
+
+-keepattributes *Annotation*
+-keep public class com.google.vending.licensing.ILicensingService
+-keep public class com.android.vending.licensing.ILicensingService
+
+# For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# keep setters in Views so that animations can still work.
+# see http://proguard.sourceforge.net/manual/examples.html#beans
+-keepclassmembers public class * extends android.view.View {
+   void set*(***);
+   *** get*();
+}
+
+# We want to keep methods in Activity that could be used in the XML attribute onClick
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+
+# For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator CREATOR;
+}
+
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+# The support library contains references to newer platform versions.
+# Don't warn about those in case this app is linking against an older
+# platform version.  We know about them, and they are safe.
+-dontwarn android.support.**
+
+# Understand the @Keep support annotation.
+-keep class android.support.annotation.Keep
+
+-keep @android.support.annotation.Keep class * {*;}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <init>(...);
+}
+```
+# **proguard-rules.pro配置**
+## **ProGuard基本指令**
+　　下面列举了我们开发中需要使用的一些指令。
+```bash
+#代码混淆压缩比，在0~7之间，默认为5，一般不做修改
+-optimizationpasses 5
+
+#混合时不使用大小写混合，混合后的类名为小写
+-dontusemixedcaseclassnames
+
+#指定不去忽略非公共库的类
+-dontskipnonpubliclibraryclasses
+
+#这句话能够使我们的项目混淆后产生映射文件
+#包含有类名->混淆后类名的映射关系
+-verbose
+
+#指定不去忽略非公共库的类
+-dontskipnonpubliclibraryclassmembers
+
+#不做预校验，preverify是proguard的四个步骤之一，Android不需要preverify，去掉这一步能够加快混淆速度。
+-dontpreverify
+
+#保留Annotation不混淆
+-keepattributes *Annotation*,InnerClasses
+
+#避免混淆泛型
+-keepattributes Signature
+
+#抛出异常时保留代码行号
+-keepattributes SourceFile,LineNumberTable
+
+#指定混淆是采用的算法，后面的参数是一个过滤器
+#这个过滤器是谷歌推荐的算法，一般不做更改
+-optimizations !code/simplification/cast,!field/*,!class/merging/*
+```
+## **需要保留的代码**
+　　下面列举了一些在我们的app开发中需要保留的内容。
+```bash
+#保留我们使用的四大组件，自定义的Application等等这些类不被混淆
+#因为这些子类都有可能被外部调用
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Appliction
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class * extends android.view.View
+-keep public class com.android.vending.licensing.ILicensingService
+
+#保留support下的所有类及其内部类
+-keep class android.support.** {*;}
+
+#保留R下面的资源
+-keep class **.R$* {*;}
+
+#保留本地native方法不被混淆
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+#保留在Activity中的方法参数是view的方法，
+#这样以来我们在layout中写的onClick就不会被影响
+-keepclassmembers class * extends android.app.Activity{
+    public void *(android.view.View);
+}
+
+#保留枚举类不被混淆
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+#保留我们自定义控件（继承自View）不被混淆
+-keep public class * extends android.view.View{
+    *** get*();
+    void set*(***);
+    public <init>(android.content.Context);
+    public <init>(android.content.Context, android.util.AttributeSet);
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+
+#保留Parcelable序列化类不被混淆
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+#保留Serializable序列化的类不被混淆
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+#对于带有回调函数的onXXEvent的，不能被混淆
+-keepclassmembers class * {
+    void *(**On*Event);
+}
+
+```
+## **针对我们的App进行配置**
+**1. 对于实体类我们不能混淆**
+　　对于实力类我们不能进行混淆，我们需要保留他们的set和get方法。对于boolean类型的get方法为isXXX,不能够遗漏。在开发的时候我们可以将所有的实体类放在一个包内，这样我们写一次混淆就行了。
+```
+-keep public class com.ljd.example.entity.** {
+    public void set*(***);
+    public *** get*();
+    public *** is*();
+}
+```
+**2. 在我们的app中使用了webView需要进行特殊处理**
+　　在我们的项目中经常会嵌入一些webview做一些复杂的操作，这时候我们能够添加如下代码。
+```bash
+-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+   public *;
+}
+-keepclassmembers class * extends android.webkit.webViewClient {
+    public void *(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
+    public boolean *(android.webkit.WebView, java.lang.String);
+}
+-keepclassmembers class * extends android.webkit.webViewClient {
+    public void *(android.webkit.webView, jav.lang.String);
+}
+```
+**3. 在app中与HTML5的JavaScript的交互进行特殊处理**
+　　在我们的App中有时候需要与Html5中的JavaScript进行交互。例如：
+```
+package com.ljd.example;
+
+public class JSInterface {
+    @JavascriptInterface
+    public void callAndroidMethod(){
+        // do something
+    }
+}
+```
+　　我们需要确保这些js要调用的原生方法不能够被混淆，于是我们需要做如下处理：
+```bash
+-keepclassmembers class com.ljd.example.JSInterface {
+    <methods>;
+}
+```
+**4. 对含有反射类的处理**
+```bash
+-keep class 类所在的包.** { *; }
+```
+**5.对于第三方依赖库的处理**
+　　这个取决于第三方的混淆策略。下面列举一些第三方依赖库的混淆策略。具体还以官方给出的为准。
+```bash
+#支付宝
+-libraryjars libs/alipaysdk.jar
+-dontwarn com.alipay.android.app.**
+-keep public class com.alipay.**  { *; }
+
+# Retrolambda
+-dontwarn java.lang.invoke.*
+
+#realm
+-keep class io.realm.annotations.RealmModule
+-keep @io.realm.annotations.RealmModule class *
+-keep class io.realm.internal.Keep
+-keep @io.realm.internal.Keep class * { *; }
+-dontwarn javax.**
+-dontwarn io.realm.**
+
+# OrmLite
+-keep class com.j256.**
+-keepclassmembers class com.j256.** { *; }
+-keep enum com.j256.**
+-keepclassmembers enum com.j256.** { *; }
+-keep interface com.j256.**
+-keepclassmembers interface com.j256.** { *; }
+
+#极光推送
+-dontoptimize
+-dontpreverify
+
+-dontwarn cn.jpush.**
+-keep class cn.jpush.** { *; }
+
+#EventBus
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}
+
+#retroift
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+#ButterKnife
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
+#fastjson
+-dontwarn com.alibaba.fastjson.**
+-keep class com.alibaba.fastjson.** { *; }
+
+#rxjava
+-dontwarn sun.misc.**
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+ long producerIndex;
+ long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+ rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+ rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+
+#jackson
+-dontwarn org.codehaus.jackson.**
+-dontwarn com.fasterxml.jackson.databind.**
+-keep class org.codehaus.jackson.** { *;}
+-keep class com.fasterxml.jackson.** { *; }
+
+#Facebook
+-keep class com.facebook.** {*;}
+-keep interface com.facebook.** {*;}
+-keep enum com.facebook.** {*;}
+
+#Fresco
+-keep class com.facebook.fresco.** {*;}
+-keep interface com.facebook.fresco.** {*;}
+-keep enum com.facebook.fresco.** {*;}
+```
+# **在Android中配置ProGuard模板代码**
+　　对于ProGuard的配置在下面给出代码的通用部分，在使用的时候直接复制即可，之后根据自己的项目进行添加一些自己项目中所需要保留的内容，以及所依赖第三方库的处理即可。在下面代码中对于在proguard-android.txt中已经添加过得代码在这里可以选择忽略。
+```bash
+#############################################
+#
+# 对于一些基本指令的添加
+#
+#############################################
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose
+-dontskipnonpubliclibraryclassmembers
+-dontpreverify
+-keepattributes *Annotation*,InnerClasses
+-keepattributes Signature
+-keepattributes SourceFile,LineNumberTable
+-optimizations !code/simplification/cast,!field/*,!class/merging/*
+
+
+#############################################
+#
+# Android开发中一些需要保留的公共部分
+#
+#############################################
+
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Appliction
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class * extends android.view.View
+-keep public class com.android.vending.licensing.ILicensingService
+-keep class android.support.** {*;}
+-keep class **.R$* {*;}
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-keepclassmembers class * extends android.app.Activity{
+    public void *(android.view.View);
+}
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keep public class * extends android.view.View{
+    *** get*();
+    void set*(***);
+    public <init>(android.content.Context);
+    public <init>(android.content.Context, android.util.AttributeSet);
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+-keepclassmembers class * {
+    void *(**On*Event);
+}
+
+#webView处理，项目中没有使用到webView忽略即可
+-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+   public *;
+}
+-keepclassmembers class * extends android.webkit.webViewClient {
+    public void *(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
+    public boolean *(android.webkit.WebView, java.lang.String);
+}
+-keepclassmembers class * extends android.webkit.webViewClient {
+    public void *(android.webkit.webView, jav.lang.String);
+}
+
+#############################################
+#
+# 项目中特殊处理部分
+#
+#############################################
+
+#-----------处理反射类---------------
+
+......
+
+#-----------处理js交互---------------
+
+......
+
+#-----------处理实体类---------------
+
+......
+
+#-----------处理第三方依赖库---------
+
+......
+
+```
+# **注意事项**
+**1. 确保混淆不会对项目产生影响**
+　　对于我们的Android项目最好是能够在一开始就是用ProGuard进行处理。并且在debug模式下也进行ProGuard处理，这样就能够在我们的开发中进行处理ProGuard所造成的影响。
+**2. 打包时忽略警告**
+　　在我们打包的时候，会发现很多could not reference class之类的warning信息。如果我们能够确认App在运行中和那些引用没有什么关系，可以添加-dontwarn标签。如-dontwarn org.apache.harmony.**。
+　　我们不要使用-ignorewarnings语句，这个会忽略所有警告，会有很多潜在的风险。
+# **总结**
+　　对于ProGuard的使用不是很复杂，但是在我们的项目中使用ProGuard是必不可少的，它不仅仅能够对代码进行混淆，还能够优化我们的代码，减少我们apk文件的体积。从而优化我们的代码
+# **附录**
+[Proguard手册](https://stuff.mit.edu/afs/sipb/project/android/sdk/android-sdk-linux/tools/proguard/docs/index.html#manual/introduction.html)
+[ProGuard ReTrace 手册](http://developer.android.com/intl/zh-cn/tools/help/proguard.html)
+
+

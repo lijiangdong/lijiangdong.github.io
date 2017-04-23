@@ -1,11 +1,10 @@
 ---
 title:  EventBus3.0使用详解
 date: 2016-03-12 16:50 
-category: [android]
+category: [Android]
 tags: [EventBus]
 comments: true
 ---
-# **综述**
 　　这里所介绍的EventBus指的是greenrobot的EventBus，它是一款针对Android的发布/订阅事件总线。它能够让我们很轻松的实现在Android的各个组件以及线程之间进行传递消息。并且将事件的发送者与接收者之间进行解耦。而且他还是轻量级的Android类库。对于EventBus3.0中相对于先前的版本中用法有所改变，那么下面我们就来看一下如何使用这个EventBus;<!--more-->
 # **使用方法**
 　　对于EventBus的使用也是非常简单的，事件的发送方将事件发出，通过EventBus将事件传递给改事件的订阅者进行使用。

@@ -1,11 +1,11 @@
 ---
 title:   Android的IPC机制(五)—ContentProvider的使用
 date: 2016-02-28 16:47
-category: [android]
+category: [Android]
 tags: [ipc,aidl]
 comments: true
 ---
-# **综述**
+
 　　对于前面一些的ipc过程都是Service与客户端进行通信。那么在不同应用之间ipc可以采用哪些方式呢？首先我们会想到ContentProvider，因为我们平时获取手机上的联系人，图片等等都是通过ContentProvider得到的。ContentProvider是Android的四大组件之一。翻译成中文为内容提供者，也就是可以将自己的数据提供给别的应用进行使用。那么我们现在就来看一下ContentProvider的使用方法。<!--more-->
 # **ContentProvider的用法**
 　　ContentProvider的用法其实也很简单。当我们的两个应用需要进行数据共享的时候，我们就可以利用ContentProvider为所需要共享的数据定义一个Uri，然后其他应用通过Context获得ContentResolver并将数据的Uri传入即可。对于ContentProvider最重要的就是他的数据模型(data model)和Uri。那么我们现在就先看一下他的数据模型和这个URI是什么。

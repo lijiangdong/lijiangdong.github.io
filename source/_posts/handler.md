@@ -1,11 +1,10 @@
 ---
 title:   Android的消息机制—Handler的工作过程
 date: 2016-03-14 20:54
-category: [android]
+category: [Android]
 tags: [Handler]
 comments: true
 ---
-# **综述**
 　　在Android系统中，出于对性能优化的考虑，对于Android的UI操作并不是线程安全的。也就是说若是有多个线程来操作UI组件，就会有可能导致线程安全问题。所以在Android中规定只能在UI线程中对UI进行操作。这个UI线程是在应用第一次启动时开启的，也称之为主线程（Main Thread），该线程专门用来操作UI组件，在这个UI线程中我们不能进行耗时操作，否则就会出现ANR(Application Not Responding)现象。如果我们在子线程中去操作UI，那么程序就回给我们抛出异常。这是因为在ViewRootImpl中对操作UI的线程进行检查。如果操作UI的线程不是主线程则抛出异常（对于在检查线程之前在非UI线程已经操作UI组件的情况除外）。所以这时候我们若是在子线程中更新UI的话可以通过Handler来完成这一操作。<!--more-->
 # **Handler用法简介**
 　　在开发中，我们对Handler的使用也基本上算是家常便饭了。在这里我们就简单的说一下Handler的几种用法示例，就不在具体给出Demo进行演示。在这里我们只针对后面这一种情形来看一下Handler的使用：在子线程完成任务后通过Handler发送消息，然后在主线程中去操作UI。

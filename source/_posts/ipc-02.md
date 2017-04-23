@@ -1,11 +1,10 @@
 ---
 title: Android的IPC机制(二)—AIDL实现原理简析
 date: 2016-02-20 20:10
-category: [android]
+category: [Android]
 tags: [ipc,aidl]
 comments: true
 ---
-# **综述**
 　　上篇说到AIDL的使用方法，我们不能仅仅只是满足对AIDL的使用，那么对于AIDL到底是如何实现的呢？为什么我们只是创建一个AIDL文件，系统就会为我们自动生成一个Java文件，那么这个Java文件里面到底包含了哪些内容呢？我们今天就来研究一下。<!--more-->
 # **AIDL实现原理**
 　　在这里我们首先看一下AIDL是怎么实现的。当我们创建一个Service和一个AIDL接口的时候，然后创建一个Binder对象并在Service中的onBind方法中去返回这个Binder对象到客户端，客户端得到这个对象后就可以绑定服务端的Service，并且与服务端建立连接后就可以访问服务端的方法了。所以在整个AIDL的实现过程中这个Binder是关键。那么这个Binder究竟是什么呢？在这里简要说明一下。

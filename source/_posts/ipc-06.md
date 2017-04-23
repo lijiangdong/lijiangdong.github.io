@@ -1,11 +1,11 @@
 ---
 title:  Android的IPC机制(六)—BroadcastReceiver的使用
 date: 2016-02-29 18:00
-category: [android]
+category: [Android]
 tags: [ipc]
 comments: true
 ---
-# **综述**
+
 　　在Android的四大组件中除了ContentProvider能够用于进程间的通信外，还有一个也能够用于进程间的通信，那就是BroadcastReceiver。BroadcastReceiver翻译成中文为广播接收器，既然作为广播接收器，那么必然就有Broadcast。在Android中，Broadcast是一种广泛运用的在应用程序之间传输信息的机制。而BroadcastReceiver则是对发送出来的 Broadcast进行过滤接受并响应的一类组件。在 Android 里面有各种各样的广播，比如电池的使用状态，电话的接收和短信的接收都会产生一个广播，应用程序开发者也可以监听这些广播并做出程序逻辑的处理。<!--more-->
 # **生命周期**
 　　对于BroadcastReceiver的生命周期也是非常的简单。它的生命周期只存在于onReceive方法中。对于这个onReceive方法它也是运行在主线程中。所以在onReceive方法中不能进行的耗时的操作。否则就会出现ANR(Application Not Responding)。由于这个ANR的限制对于onReceive方法最多可执行的时间为10秒左右。并且由于BroadcastReceiver的生命周期随着onReceive方法的结束而结束。所以我们不能再onReceive方法中去创建一个线程来执行任务。因为onReceive方法执行完毕，这时候这个BroadcastReceiver 也就结束了。也就无法处理异步的结果。如果这个BroadcastReceiver在独立的进程中，它所在进程也很容易在系统需要内存时被优先杀死 , 因为它属于空进程 ( 没有任何活动组件的进程 ). 那么正在工作的子线程也会被杀死 。若是我们需要完成一个比较耗时任务的话，我们可以通过发送Intent给Service，并且由这个Service来完成这项任务。

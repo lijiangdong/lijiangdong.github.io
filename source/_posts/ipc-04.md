@@ -1,11 +1,11 @@
 ---
 title:  Android的IPC机制(四)— Messenger的使用及源码分析
 date: 2016-02-25 18:22
-category: [android]
+category: [Android]
 tags: [ipc,aidl]
 comments: true
 ---
-# **综述**
+
 　　在前面几篇中我们详细的介绍了AIDL的使用及原理。在这里我们感觉到AIDL的在使用过程中还是比较复杂的，那么有没有一种简单的方法来实现进程间的通信呢？当然是有的，那就是利用Messenger。Messenger翻译为信使，从他的名字就可以看出这个Messenger就是作为传递消息用的。那么我们就来看一下这个Messenger到底是如何使用的，以及在它内部是如何实现的。<!--more-->
 # **Messenger的使用**
 ## **使用步骤**
