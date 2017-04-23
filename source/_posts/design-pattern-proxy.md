@@ -1,7 +1,7 @@
 ---
 title:   Java设计模式之代理模式
 date: 2016-05-17 23:56
-category: [java,设计模式]
+category: [Java]
 tags: [设计模式]
 comments: true
 ---

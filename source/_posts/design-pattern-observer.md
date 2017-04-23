@@ -1,7 +1,7 @@
 ---
 title:   Java设计模式之观察者模式
 date: 2016-04-27 17:17
-category: [java,设计模式]
+category: [Java]
 tags: [设计模式]
 comments: true
 ---

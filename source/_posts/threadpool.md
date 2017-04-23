@@ -1,7 +1,7 @@
 ---
 title: Java中的线程池
 date: 2016-04-28 23:26
-category: [java]
+category: [Java]
 tags: [ThreadPool]
 comments: true
 ---
