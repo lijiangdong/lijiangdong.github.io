@@ -2,7 +2,7 @@
 title:   Android的IPC机制(五)—ContentProvider的使用
 date: 2016-02-28 16:47
 category: [Android]
-tags: [ipc,aidl]
+tags: [ipc]
 comments: true
 ---
 

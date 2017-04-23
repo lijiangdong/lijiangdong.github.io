@@ -2,7 +2,7 @@
 title:  Retrofit2源码解读
 date: 2016-06-18 15:20
 category: [Android]
-tags: [Retrofit]
+tags: [retrofit]
 comments: true
 ---
 

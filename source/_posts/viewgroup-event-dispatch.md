@@ -2,7 +2,7 @@
 title:  Android事件分发机制(上)—ViewGroup的事件分发
 date: 2016-05-13 13:31 
 category: [Android]
-tags: [View]
+tags: [view]
 comments: true
 ---
 　　Android中的事件分发机制也就是View与ViewGroup的对事件的分发与处理。在ViewGroup的内部包含了许多View，而ViewGroup继承自View，所以ViewGroup本身也是一个View。对于事件可以通过ViewGroup下发到它的子View并交由子View进行处理，而ViewGroup本身也能够对事件做出处理。下面就来详细分析一下ViewGroup对时间的分发处理。<!--more-->

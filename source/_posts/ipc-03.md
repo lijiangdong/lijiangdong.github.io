@@ -2,7 +2,7 @@
 title:  Android的IPC机制(三)—Binder连接池
 date: 2016-02-24 20:00
 category: [Android]
-tags: [ipc,aidl]
+tags: [ipc]
 comments: true
 ---
 

@@ -2,7 +2,7 @@
 title:   Retrofit2.0使用详解
 date: 2016-04-03 01:09
 category: [Android]
-tags: [Retrofit]
+tags: [retrofit]
 comments: true
 ---
 

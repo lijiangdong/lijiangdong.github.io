@@ -2,7 +2,7 @@
 title:  Android的IPC机制(四)— Messenger的使用及源码分析
 date: 2016-02-25 18:22
 category: [Android]
-tags: [ipc,aidl]
+tags: [ipc]
 comments: true
 ---
 

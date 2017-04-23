@@ -2,7 +2,7 @@
 title:  Android事件分发机制(下)—View的事件处理
 date: 2016-05-15 19:23
 category: [Android]
-tags: [View]
+tags: [view]
 comments: true
 ---
 　　在上篇文章[Android中的事件分发机制(上)——ViewGroup的事件分发](http://blog.csdn.net/ljd2038/article/details/51394605)中，对ViewGroup的事件分发进行了详细的分析。在文章的最后ViewGroup的dispatchTouchEvent方法调用dispatchTransformedTouchEvent方法成功将事件传递给ViewGroup的子View。并交由子View进行处理。那么现在就来分析一下子View接收到事件以后是如何处理的。<!--more-->

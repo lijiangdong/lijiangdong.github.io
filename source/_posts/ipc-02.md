@@ -2,7 +2,7 @@
 title: Android的IPC机制(二)—AIDL实现原理简析
 date: 2016-02-20 20:10
 category: [Android]
-tags: [ipc,aidl]
+tags: [ipc]
 comments: true
 ---
 　　上篇说到AIDL的使用方法，我们不能仅仅只是满足对AIDL的使用，那么对于AIDL到底是如何实现的呢？为什么我们只是创建一个AIDL文件，系统就会为我们自动生成一个Java文件，那么这个Java文件里面到底包含了哪些内容呢？我们今天就来研究一下。<!--more-->

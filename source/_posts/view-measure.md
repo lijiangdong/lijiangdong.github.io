@@ -2,7 +2,7 @@
 title:   Android视图的绘制流程(上)——View的测量
 date: 2016-06-10 22:34
 category: [Android]
-tags: [View]
+tags: [view]
 comments: true
 ---
 

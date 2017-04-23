@@ -2,7 +2,7 @@
 title:  EventBus3.0源码解读
 date: 2016-05-21 15:43
 category: [Android]
-tags: [EventBus]
+tags: [eventbus]
 comments: true
 ---
 

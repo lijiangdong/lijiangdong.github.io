@@ -1,7 +1,7 @@
 ---
 title:  Java注解在Android中使用
 date: 2016-06-04 21:40
-category: [Android,Java]
+category: [Java]
 tags: [Annotation]
 comments: true
 ---

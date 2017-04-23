@@ -1,6 +1,6 @@
 ---
 title:  Android稳定性测试工具Monkey的使用
-date: 2016-12-11 16:34
+date: 2017-01-15 13:07
 category: [Android]
 tags: [测试]
 comments: true

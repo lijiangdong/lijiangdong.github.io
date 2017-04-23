@@ -2,7 +2,7 @@
 title:  Android视图的绘制流程(下)——View的Layout与Draw过程
 date: 2016-06-11 13:26
 category: [Android]
-tags: [View]
+tags: [view]
 comments: true
 ---
 

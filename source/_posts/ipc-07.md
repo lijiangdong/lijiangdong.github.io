@@ -2,7 +2,7 @@
 title:  Android的IPC机制(七)—Socket的原理简析与使用
 date: 2016-03-06 20:54 
 category: [Android]
-tags: [ipc,socket]
+tags: [ipc]
 comments: true
 ---
 

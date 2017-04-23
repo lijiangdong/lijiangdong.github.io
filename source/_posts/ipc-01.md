@@ -2,7 +2,7 @@
 title: Android的IPC机制(一)—AIDL的使用
 date: 2016-02-20 13:54
 category: [Android]
-tags: [ipc,aidl]
+tags: [ipc]
 comments: true
 ---
 
