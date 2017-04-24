@@ -308,7 +308,7 @@ baidu_analytics: 75a5108fa849298412266b0c02b04616
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: lijiangdong-github-io
   count: true
 
@@ -330,7 +330,7 @@ changyan:
 
 # Support for LiveRe comments system.
 # You can get your uid from https://livere.com/insight/myCode (General web site)
-#livere_uid: your uid
+livere_uid: MTAyMC8yODM0MS80OTEz
 
 # Baidu Share
 # Available value:
