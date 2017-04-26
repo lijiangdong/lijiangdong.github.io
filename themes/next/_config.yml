@@ -79,8 +79,8 @@ menu_icons:
 
 # Schemes
 #scheme: Muse
-#scheme: Mist
-scheme: Pisces
+scheme: Mist
+#scheme: Pisces
 
 
 # ---------------------------------------------------------------
@@ -316,7 +316,7 @@ disqus:
 #hypercomments_id:
 
 # Gentie productKey
-gentie_productKey: f85b0a8eee1341d2bb825ae0a425ab7a
+#gentie_productKey: f85b0a8eee1341d2bb825ae0a425ab7a
 
 # changyan
 changyan:
@@ -330,7 +330,7 @@ changyan:
 
 # Support for LiveRe comments system.
 # You can get your uid from https://livere.com/insight/myCode (General web site)
-#livere_uid: MTAyMC8yODM0MS80OTEz
+livere_uid: MTAyMC8yODM0MS80OTEz
 
 # Baidu Share
 # Available value:
