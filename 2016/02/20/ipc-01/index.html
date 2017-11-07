@@ -1,0 +1,1224 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ipc," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。">
+<meta name="keywords" content="ipc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android的IPC机制(一)—AIDL的使用">
+<meta property="og:url" content="http://lijiangdong.github.io/2016/02/20/ipc-01/index.html">
+<meta property="og:site_name" content="李江东">
+<meta property="og:description" content="IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160220165323807">
+<meta property="og:image" content="http://img.blog.csdn.net/20160220151918200">
+<meta property="og:image" content="http://img.blog.csdn.net/20160220151944872">
+<meta property="og:image" content="http://img.blog.csdn.net/20160220152001794">
+<meta property="og:updated_time" content="2017-11-06T14:20:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android的IPC机制(一)—AIDL的使用">
+<meta name="twitter:description" content="IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160220165323807">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://lijiangdong.github.io/2016/02/20/ipc-01/"/>
+
+
+
+
+
+  <title>Android的IPC机制(一)—AIDL的使用 | 李江东</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75a5108fa849298412266b0c02b04616";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李江东</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://lijiangdong.github.io/2016/02/20/ipc-01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="无嘴小呆子">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李江东">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android的IPC机制(一)—AIDL的使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-20T13:54:00+08:00">
+                2016-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/02/20/ipc-01/" class="leancloud_visitors" data-flag-title="Android的IPC机制(一)—AIDL的使用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　IPC(interprocess communication)是指进程间通信，也就是在两个进程间进行数据交互。不同的操作系统都有他们自己的一套IPC机制。例如在Linux操作系统中可以通过管道、信号量、消息队列、内存共享、套接字等进行进程间通信。那么在Android系统中我们可以通过Binder来进行进程间的通信。当然除了Binder我们还可以使用Socket来进行进程间的通信。<a id="more"></a><br>　　既然需要进程通信，那么就必须有多个进程。当然，在两个应用交互中必然出现多进程的情况。若是在一个应用中呢？我们可以通过给四大组件在AndroidMenifest中为他们指定android:process属性来实现不同的组件在不同进程中运行。下面就来介绍一下Android中进程间通信的实现方式。</p>
+<h1 id="AIDL简介"><a href="#AIDL简介" class="headerlink" title="AIDL简介"></a><strong>AIDL简介</strong></h1><p>　　AIDL是 Android Interface Definition Language的缩写。AIDL 是一种IDL 语言，用于生成可以在Android设备上两个进程之间进行 IPC的代码。如果在一个进程中（例如Activity）要调用另一个进程中（例如Service）对象的操作，就可以使用AIDL生成可序列化的参数。<br>　　AIDL是面向接口的，像COM或Corba一样，但是更加轻量级。它是使用代理类在客户端和实现端传递数据。</p>
+<h1 id="AIDL用法"><a href="#AIDL用法" class="headerlink" title="AIDL用法"></a><strong>AIDL用法</strong></h1><p>　　首先我们创建一个AIDL文件，在AndroidStudio中当我们创建一个AIDL文件时会自动为我们创件一个AILD文件夹，用于存放AIDL文件。创建完之后重新rebuild会自动生成aidl实现类。<br>　　<img src="http://img.blog.csdn.net/20160220165323807" alt="这里写图片描述"><br>　　在下面的例子当中，我们将Service单独作为一个应用在系统中运行，在另一个用于访问Service的client也单独作为一个应用运行在系统中。这样保证了两个程序分别运行在两个进程中。并且使用了<a href="https://github.com/JakeWharton/butterknife" target="_blank" rel="external">butterknife</a>进行控件绑定。</p>
+<h2 id="AIDL简单用法"><a href="#AIDL简单用法" class="headerlink" title="AIDL简单用法"></a><strong>AIDL简单用法</strong></h2><h3 id="演示"><a href="#演示" class="headerlink" title="演示"></a><strong>演示</strong></h3><p>　　在Service中我们对客户端传来的两个整数做了一次加法运算并返回到客户端中。<br><img src="http://img.blog.csdn.net/20160220151918200" alt="这里写图片描述">
+　　</p>
+<h3 id="AIDL代码"><a href="#AIDL代码" class="headerlink" title="AIDL代码"></a><strong>AIDL代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ICalculate.aidl</span></div><div class="line"><span class="keyword">package</span> com.ljd.aidl;</div><div class="line"></div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ICalculate</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * Demonstrates some basic types that you can use as parameters</span></div><div class="line"><span class="comment">     * and return values in AIDL.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> first, <span class="keyword">int</span> second)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a><strong>服务端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.service;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.app.Service;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.os.Binder;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.ICalculate;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CalculateService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CalculateService</span><span class="params">()</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Binder mBinder = <span class="keyword">new</span> ICalculate.Stub()&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> first, <span class="keyword">int</span> second)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            <span class="keyword">return</span> first + second;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> mBinder;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="客户端代码"><a href="#客户端代码" class="headerlink" title="客户端代码"></a><strong>客户端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.activity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.content.ComponentName;</div><div class="line"><span class="keyword">import</span> android.content.Context;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.content.ServiceConnection;</div><div class="line"><span class="keyword">import</span> android.os.Bundle;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</div><div class="line"><span class="keyword">import</span> android.util.Log;</div><div class="line"><span class="keyword">import</span> android.view.View;</div><div class="line"><span class="keyword">import</span> android.widget.Toast;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.ICalculate;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.client.R;</div><div class="line"></div><div class="line"><span class="keyword">import</span> butterknife.ButterKnife;</div><div class="line"><span class="keyword">import</span> butterknife.OnClick;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1Activity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String TAG = <span class="string">"DEMO1"</span>;</div><div class="line">    <span class="comment">//是否已经绑定service</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsBindService;</div><div class="line">    <span class="keyword">private</span> ICalculate mCalculate;</div><div class="line">    <span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</div><div class="line">            Log.d(TAG,<span class="string">"bind success"</span>);</div><div class="line">            Toast.makeText(Demo1Activity.<span class="keyword">this</span>,<span class="string">"bind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">            mCalculate = ICalculate.Stub.asInterface(service);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</div><div class="line">        <span class="comment">//重新绑定Service防止系统将服务进程杀死而产生的调用错误。</span></div><div class="line">            bindService();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_demo1);</div><div class="line">        ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line">        mIsBindService = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        unbindService();</div><div class="line">        ButterKnife.unbind(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(&#123; R.id.bind_demo1_btn,R.id.unbind_demo1_btn,R.id.calculate_btn&#125;)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickButton</span><span class="params">(View v)</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (v.getId())&#123;</div><div class="line">            <span class="keyword">case</span> R.id.bind_demo1_btn:</div><div class="line">                bindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.unbind_demo1_btn:</div><div class="line">                Toast.makeText(<span class="keyword">this</span>,<span class="string">"unbind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                unbindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.calculate_btn:</div><div class="line">                <span class="keyword">if</span> (mIsBindService &amp;&amp; mCalculate != <span class="keyword">null</span> )&#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        <span class="keyword">int</span> result = mCalculate.add(<span class="number">2</span>,<span class="number">4</span>);</div><div class="line">                        Log.d(TAG,String.valueOf(result));</div><div class="line">                        Toast.makeText(<span class="keyword">this</span>,String.valueOf(result),Toast.LENGTH_SHORT).show();</div><div class="line">                    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    Toast.makeText(<span class="keyword">this</span>,<span class="string">"not bind service"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">bindService</span><span class="params">()</span></span>&#123;</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent();</div><div class="line">        intent.setAction(<span class="string">"com.ljd.aidl.action.CALCULATE_SERVICE"</span>);</div><div class="line">        bindService(intent,mConnection, Context.BIND_AUTO_CREATE);</div><div class="line">        mIsBindService = <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">unbindService</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span>(mIsBindService)&#123;</div><div class="line">            mIsBindService = <span class="keyword">false</span>;</div><div class="line">            unbindService(mConnection);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="AIDL高级用法"><a href="#AIDL高级用法" class="headerlink" title="AIDL高级用法"></a><strong>AIDL高级用法</strong></h2><p>　　对于上面的例子，在AIDL接口中只是使用了一些Java的基本类型，对于AIDL文件并不是所有的类型都是可用的，那么在AIDL中究竟有哪些类型可以使用呢？</p>
+<h3 id="AIDL语法规则"><a href="#AIDL语法规则" class="headerlink" title="AIDL语法规则"></a><strong>AIDL语法规则</strong></h3><p>默认情况下AIDL支持以下数据类型：</p>
+<ul>
+<li>所有Java的基本数据类型（例如： int, long,double, char, boolean等）</li>
+<li>String和CharSequence</li>
+<li>List：AIDL实际接收到的是ArrayList，并且List里面所有元素都必须被AIDL支持</li>
+<li>Map: AIDL实际接收到的是HashMap，并且Map里面所有元素都必须被AIDL支持</li>
+</ul>
+<p>如果不是上面所述类型，我们必须要显示import进来，即使他们在同一个包中。当我们使用自定义的对象时必须实现Parcelable接口，Parcelable为对象序列化接口，效率比实现Serializable接口高。并且新建一个与该类同名的AIDL文件，声明他为Parcelable类型。</p>
+<p>我们定义AIDL接口还需要注意以下几点：</p>
+<ul>
+<li>方法可以有多个或没有参数，可以有返回值也可以为void</li>
+<li>在参数中，除了基本类型以外，我们必须为参数标上方向in, out, 或者 inout</li>
+<li>在AIDL文件中只支持方法，不支持静态常量<h3 id="演示-1"><a href="#演示-1" class="headerlink" title="演示"></a><strong>演示</strong></h3>　　在计算机商店中需要采购笔记本进行销售，在服务端中我们添加两台笔记本，在客户端中我们为商店加购一台dell笔记本。<br><img src="http://img.blog.csdn.net/20160220151944872" alt="这里写图片描述">
+　　<h3 id="实体类代码"><a href="#实体类代码" class="headerlink" title="实体类代码"></a><strong>实体类代码</strong></h3>　　我们首先构建一个计算机实体类，包含笔记本的id，品牌，型号，并且实现Parcelable接口，在AndroidStudio中会为我们自动构造代码。
+　　<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.entity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.os.Parcel;</div><div class="line"><span class="keyword">import</span> android.os.Parcelable;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputerEntity</span> <span class="keyword">implements</span> <span class="title">Parcelable</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> computerId;     <span class="comment">//id</span></div><div class="line">    <span class="keyword">public</span> String brand;       <span class="comment">//品牌</span></div><div class="line">    <span class="keyword">public</span> String model;       <span class="comment">//型号</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputerEntity</span><span class="params">(<span class="keyword">int</span> computerId, String brand, String model)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.brand = brand;</div><div class="line">        <span class="keyword">this</span>.computerId = computerId;</div><div class="line">        <span class="keyword">this</span>.model = model;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">ComputerEntity</span><span class="params">(Parcel in)</span> </span>&#123;</div><div class="line">        computerId = in.readInt();</div><div class="line">        brand = in.readString();</div><div class="line">        model = in.readString();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Creator&lt;ComputerEntity&gt; CREATOR = <span class="keyword">new</span> Creator&lt;ComputerEntity&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> ComputerEntity <span class="title">createFromParcel</span><span class="params">(Parcel in)</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ComputerEntity(in);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="keyword">public</span> ComputerEntity[] newArray(<span class="keyword">int</span> size) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ComputerEntity[size];</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">describeContents</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeToParcel</span><span class="params">(Parcel dest, <span class="keyword">int</span> flags)</span> </span>&#123;</div><div class="line">        dest.writeInt(computerId);</div><div class="line">        dest.writeString(brand);</div><div class="line">        dest.writeString(model);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="AIDL代码-1"><a href="#AIDL代码-1" class="headerlink" title="AIDL代码"></a><strong>AIDL代码</strong></h3><p>　　在AIDL中对实体类进行声明，包名和文件名必须与实体类一致。在AndroidStudio中新建一个与实体类同名的AIDL文件会报错，需要先用一个其它名字，然后修改与实体类名一致即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.entity;</div><div class="line"></div><div class="line"><span class="comment">//包名必须和对用实体类的包名一致</span></div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line">parcelable ComputerEntity;</div></pre></td></tr></table></figure>
+<p>　　添加两个接口分别为添加一台笔记本和获取全部笔记本，在该文件中使用到了ComputerEntity类，显示的import进来。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IComputerManager</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * Demonstrates some basic types that you can use as parameters</span></div><div class="line"><span class="comment">     * and return values in AIDL.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">addComputer</span><span class="params">(in ComputerEntity computer)</span></span>;</div><div class="line">     <span class="function">List&lt;ComputerEntity&gt; <span class="title">getComputerList</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="服务端代码-1"><a href="#服务端代码-1" class="headerlink" title="服务端代码"></a><strong>服务端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.service;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.app.Service;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IComputerManager;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.List;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.CopyOnWriteArrayList;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputerService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> CopyOnWriteArrayList&lt;ComputerEntity&gt; mComputerList = <span class="keyword">new</span> CopyOnWriteArrayList&lt;&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputerService</span><span class="params">()</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> IComputerManager.Stub mBinder = <span class="keyword">new</span> IComputerManager.Stub() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addComputer</span><span class="params">(ComputerEntity computer)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            mComputerList.add(computer);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;ComputerEntity&gt; <span class="title">getComputerList</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            <span class="keyword">return</span> mComputerList;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">0</span>,<span class="string">"apple"</span>,<span class="string">"macbookpro"</span>));</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">1</span>,<span class="string">"microsoft"</span>,<span class="string">"surfacebook"</span>));</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">2</span>,<span class="string">"dell"</span>,<span class="string">"XPS13"</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> mBinder;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　注意：在该类中使用了CopyOnWriteArrayList，CopyOnWriteArrayList能够自动进行线程同步。可是在AIDL中接收和返回的只能是ArrayList，其实AIDL支持的是抽象的List，在Binder中会按照List访问数据并最终形成一个ArrayList，所以在AIDL中返回的还是一个ArrayList。</p>
+<h3 id="客户端代码-1"><a href="#客户端代码-1" class="headerlink" title="客户端代码"></a><strong>客户端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl.activity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.content.ComponentName;</div><div class="line"><span class="keyword">import</span> android.content.Context;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.content.ServiceConnection;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</div><div class="line"><span class="keyword">import</span> android.os.Bundle;</div><div class="line"><span class="keyword">import</span> android.util.Log;</div><div class="line"><span class="keyword">import</span> android.view.View;</div><div class="line"><span class="keyword">import</span> android.widget.LinearLayout;</div><div class="line"><span class="keyword">import</span> android.widget.TextView;</div><div class="line"><span class="keyword">import</span> android.widget.Toast;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IComputerManager;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.client.R;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.List;</div><div class="line"></div><div class="line"><span class="keyword">import</span> butterknife.Bind;</div><div class="line"><span class="keyword">import</span> butterknife.ButterKnife;</div><div class="line"><span class="keyword">import</span> butterknife.OnClick;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo2Activity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.show_linear)</div><div class="line">    LinearLayout mShowLinear;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsBindService;</div><div class="line">    <span class="keyword">private</span> IComputerManager mRemoteComputerManager;</div><div class="line">    <span class="keyword">private</span> IBinder.DeathRecipient mDeathRecipient = <span class="keyword">new</span> IBinder.DeathRecipient() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">binderDied</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span>(mRemoteComputerManager != <span class="keyword">null</span>)&#123;</div><div class="line">                mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,<span class="number">0</span>);</div><div class="line">                mRemoteComputerManager = <span class="keyword">null</span>;</div><div class="line">                bindService();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</div><div class="line">            mIsBindService = <span class="keyword">true</span>;</div><div class="line">            Toast.makeText(Demo2Activity.<span class="keyword">this</span>,<span class="string">"bind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">            mRemoteComputerManager = IComputerManager.Stub.asInterface(service);</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,<span class="number">0</span>);</div><div class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</div><div class="line">            mRemoteComputerManager = <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_demo2);</div><div class="line">        ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line">        mIsBindService = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        unbindService();</div><div class="line">        ButterKnife.unbind(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(&#123;R.id.bind_demo2_btn,R.id.unbind_demo2_btn,R.id.test_demo2_btn,R.id.clear_demo2_btn&#125;)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickButton</span><span class="params">(View v)</span> </span>&#123;</div><div class="line">        <span class="keyword">switch</span> (v.getId())&#123;</div><div class="line">            <span class="keyword">case</span> R.id.bind_demo2_btn:</div><div class="line">                bindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.unbind_demo2_btn:</div><div class="line">                Toast.makeText(<span class="keyword">this</span>,<span class="string">"unbind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                unbindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.test_demo2_btn:</div><div class="line">                <span class="keyword">if</span> (!mIsBindService || mRemoteComputerManager == <span class="keyword">null</span>)&#123;</div><div class="line">                    Toast.makeText(<span class="keyword">this</span>,<span class="string">"not bind service"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    List&lt;ComputerEntity&gt; computerList = mRemoteComputerManager.getComputerList();</div><div class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">0</span>;i&lt;computerList.size();i++)&#123;</div><div class="line">                        String str = <span class="string">"computerId:"</span> + String.valueOf(computerList.get(i).computerId) +</div><div class="line">                                <span class="string">" brand:"</span> + computerList.get(i).brand +</div><div class="line">                                <span class="string">" model:"</span> + computerList.get(i).model ;</div><div class="line">                        TextView textView = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">                        textView.setText(str);</div><div class="line">                        mShowLinear.addView(textView);</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.clear_demo2_btn:</div><div class="line">                mShowLinear.removeAllViews();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">bindService</span><span class="params">()</span></span>&#123;</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent();</div><div class="line">        intent.setAction(<span class="string">"com.ljd.aidl.action.COMPUTER_SERVICE"</span>);</div><div class="line">        mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">unbindService</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span>(!mIsBindService)&#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        mIsBindService = <span class="keyword">false</span>;</div><div class="line">        unbindService(mConnection);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　由于Binder是有可能会意外死亡的，也就是Service所在进程被系统杀死，这时候我们调用Service的方法就会失败。在第一个例子中我们通过onServiceDisconnected方法中重新绑定服务。在这个例子中我们采用了另外一种方法，由于在Binder中提供了两个配对的方法linkToDeath和unlinkToDeath，通过linkToDeath可以给Binder设置一个死亡代理，Binder死亡时回调binderDied方法，在binderDied方法中我们重新绑定服务即可。</p>
+<h2 id="AIDL用法拓展"><a href="#AIDL用法拓展" class="headerlink" title="AIDL用法拓展"></a><strong>AIDL用法拓展</strong></h2><p>　　当我们需要一种笔记本的时候，由于商店缺货，这时候我们会给卖家说一声，我所需要的这款笔记本到货后通知我。也就成了所谓的观察者模式。<br>　　在Android系统中为我们提供了一个RemoteCallbackList,RemoteCallbackList是系统专门用来删除跨进程的listener接口，并且在RemoteCallbackList中自动实现了线程同步功能，下面看一下它的用法。</p>
+<h3 id="演示-2"><a href="#演示-2" class="headerlink" title="演示"></a><strong>演示</strong></h3><p>　　客户端注册服务以后，服务端每隔三秒会添加一台笔记本，并通知给客户端显示。<br><img src="http://img.blog.csdn.net/20160220152001794" alt="这里写图片描述"></p>
+<h3 id="AIDL代码-2"><a href="#AIDL代码-2" class="headerlink" title="AIDL代码"></a><strong>AIDL代码</strong></h3><p>　　到货后的AIDL监听接口<br>　　<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.ljd.aidl;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IOnComputerArrivedListener</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * Demonstrates some basic types that you can use as parameters</span></div><div class="line"><span class="comment">     * and return values in AIDL.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onComputerArrived</span><span class="params">(in ComputerEntity computer)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　在IComputerManager接口中添加两个方法。显示importIOnComputerArrivedListener ,即使在同一个包下面。<br>　　<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// IComputerManagerObserver.aidl</span></div><div class="line"><span class="keyword">package</span> com.ljd.aidl;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IOnComputerArrivedListener;</div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IComputerManagerObserver</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * Demonstrates some basic types that you can use as parameters</span></div><div class="line"><span class="comment">     * and return values in AIDL.</span></div><div class="line"><span class="comment">     */</span></div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">addComputer</span><span class="params">(in ComputerEntity computer)</span></span>;</div><div class="line">     <span class="function">List&lt;ComputerEntity&gt; <span class="title">getComputerList</span><span class="params">()</span></span>;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">registerUser</span><span class="params">(IOnComputerArrivedListener listener)</span></span>;</div><div class="line">     <span class="function"><span class="keyword">void</span> <span class="title">unRegisterUser</span><span class="params">(IOnComputerArrivedListener listener)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="服务端代码-2"><a href="#服务端代码-2" class="headerlink" title="服务端代码"></a><strong>服务端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.app.Service;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.os.Binder;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.RemoteCallbackList;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IComputerManagerObserver;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IOnComputerArrivedListener;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.List;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.CopyOnWriteArrayList;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicBoolean;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ComputerObserverService</span> <span class="keyword">extends</span> <span class="title">Service</span></span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ComputerObserverService</span><span class="params">()</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> CopyOnWriteArrayList&lt;ComputerEntity&gt; mComputerList = <span class="keyword">new</span> CopyOnWriteArrayList&lt;&gt;();</div><div class="line">    <span class="keyword">private</span> RemoteCallbackList&lt;IOnComputerArrivedListener&gt; mComputerArrivedListenerList = <span class="keyword">new</span> RemoteCallbackList&lt;&gt;();</div><div class="line">    <span class="keyword">private</span> AtomicBoolean mIsServiceDestroy = <span class="keyword">new</span> AtomicBoolean(<span class="keyword">false</span>);</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Binder mBinder = <span class="keyword">new</span> IComputerManagerObserver.Stub()&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addComputer</span><span class="params">(ComputerEntity computer)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            mComputerList.add(computer);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;ComputerEntity&gt; <span class="title">getComputerList</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            <span class="keyword">return</span> mComputerList;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerUser</span><span class="params">(IOnComputerArrivedListener listener)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            mComputerArrivedListenerList.register(listener);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unRegisterUser</span><span class="params">(IOnComputerArrivedListener listener)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            mComputerArrivedListenerList.unregister(listener);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">0</span>,<span class="string">"apple"</span>,<span class="string">"macbookpro"</span>));</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">1</span>,<span class="string">"microsoft"</span>,<span class="string">"surfacebook"</span>));</div><div class="line">        mComputerList.add(<span class="keyword">new</span> ComputerEntity(<span class="number">2</span>,<span class="string">"dell"</span>,<span class="string">"XPS13"</span>));</div><div class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">while</span> (!mIsServiceDestroy.get())&#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        Thread.currentThread().sleep(<span class="number">3000</span>);</div><div class="line">                        ComputerEntity computer = <span class="keyword">new</span> ComputerEntity(mComputerList.size(),<span class="string">"******"</span>,<span class="string">"******"</span>);</div><div class="line">                        mComputerList.add(computer);</div><div class="line">                        <span class="keyword">final</span> <span class="keyword">int</span> COUNT = mComputerArrivedListenerList.beginBroadcast();</div><div class="line">                        <span class="comment">//通知所有注册过的用户</span></div><div class="line">                        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;COUNT;i++)&#123;</div><div class="line">                            IOnComputerArrivedListener listener = mComputerArrivedListenerList.getBroadcastItem(i);</div><div class="line">                            <span class="keyword">if</span> (listener != <span class="keyword">null</span>)&#123;</div><div class="line">                                listener.onComputerArrived(computer);</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                        mComputerArrivedListenerList.finishBroadcast();</div><div class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;).start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> mBinder;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">        mIsServiceDestroy.set(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　注意：RemoteCallbackList并不是一个List，所以我们不能像操作List一样操作RemoteCallbackList。并且遍历RemoteCallbackList时，beginBroadcast和finishBroadcast是配对使用的。</p>
+<h3 id="客户端代码-2"><a href="#客户端代码-2" class="headerlink" title="客户端代码"></a><strong>客户端代码</strong></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.content.ComponentName;</div><div class="line"><span class="keyword">import</span> android.content.Context;</div><div class="line"><span class="keyword">import</span> android.content.Intent;</div><div class="line"><span class="keyword">import</span> android.content.ServiceConnection;</div><div class="line"><span class="keyword">import</span> android.os.Handler;</div><div class="line"><span class="keyword">import</span> android.os.IBinder;</div><div class="line"><span class="keyword">import</span> android.os.Message;</div><div class="line"><span class="keyword">import</span> android.os.RemoteException;</div><div class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</div><div class="line"><span class="keyword">import</span> android.os.Bundle;</div><div class="line"><span class="keyword">import</span> android.view.View;</div><div class="line"><span class="keyword">import</span> android.widget.LinearLayout;</div><div class="line"><span class="keyword">import</span> android.widget.TextView;</div><div class="line"><span class="keyword">import</span> android.widget.Toast;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IComputerManagerObserver;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.IOnComputerArrivedListener;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.client.R;</div><div class="line"><span class="keyword">import</span> com.ljd.aidl.entity.ComputerEntity;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.List;</div><div class="line"></div><div class="line"><span class="keyword">import</span> butterknife.Bind;</div><div class="line"><span class="keyword">import</span> butterknife.ButterKnife;</div><div class="line"><span class="keyword">import</span> butterknife.OnClick;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo3Activity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.show_demo3_linear)</div><div class="line">    LinearLayout mShowLinear;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsBindService;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MESSAGE_COMPUTER_ARRIVED = <span class="number">1</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> IComputerManagerObserver mRemoteComputerManager;</div><div class="line">    <span class="keyword">private</span> Handler mHandler = <span class="keyword">new</span> Handler() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what)&#123;</div><div class="line">                <span class="keyword">case</span> MESSAGE_COMPUTER_ARRIVED:</div><div class="line">                    ComputerEntity computer = (ComputerEntity)msg.obj;</div><div class="line">                    String str = <span class="string">"computerId:"</span> + String.valueOf(computer.computerId) +</div><div class="line">                            <span class="string">" brand:"</span> + computer.brand +</div><div class="line">                            <span class="string">" model:"</span> + computer.model ;</div><div class="line">                    TextView textView = <span class="keyword">new</span> TextView(Demo3Activity.<span class="keyword">this</span>);</div><div class="line">                    textView.setText(str);</div><div class="line">                    mShowLinear.addView(textView);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">default</span>:</div><div class="line">                    <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> IBinder.DeathRecipient mDeathRecipient = <span class="keyword">new</span> IBinder.DeathRecipient() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">binderDied</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span>(mRemoteComputerManager != <span class="keyword">null</span>)&#123;</div><div class="line">                mRemoteComputerManager.asBinder().unlinkToDeath(mDeathRecipient,<span class="number">0</span>);</div><div class="line">                mRemoteComputerManager = <span class="keyword">null</span>;</div><div class="line">                bindService();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</div><div class="line">            mIsBindService = <span class="keyword">true</span>;</div><div class="line">            Toast.makeText(Demo3Activity.<span class="keyword">this</span>,<span class="string">"bind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">            mRemoteComputerManager = IComputerManagerObserver.Stub.asInterface(service);</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mRemoteComputerManager.asBinder().linkToDeath(mDeathRecipient,<span class="number">0</span>);</div><div class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</div><div class="line">            mRemoteComputerManager = <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> IOnComputerArrivedListener mOnComputerArrivedListener = <span class="keyword">new</span> IOnComputerArrivedListener.Stub()&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onComputerArrived</span><span class="params">(ComputerEntity computer)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">            mHandler.obtainMessage(MESSAGE_COMPUTER_ARRIVED,computer).sendToTarget();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_demo3);</div><div class="line">        ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line">        mIsBindService = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        unbindService();</div><div class="line">        ButterKnife.unbind(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(&#123;R.id.bind_demo3_btn,R.id.unbind_demo3_btn,R.id.test_demo3_btn,R.id.clear_demo3_btn&#125;)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickButton</span><span class="params">(View v)</span></span>&#123;</div><div class="line">        <span class="keyword">switch</span> (v.getId())&#123;</div><div class="line">            <span class="keyword">case</span> R.id.bind_demo3_btn:</div><div class="line">                bindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.unbind_demo3_btn:</div><div class="line">                Toast.makeText(<span class="keyword">this</span>,<span class="string">"unbind service success"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                unbindService();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.test_demo3_btn:</div><div class="line">                <span class="keyword">if</span> (!mIsBindService || mRemoteComputerManager == <span class="keyword">null</span>)&#123;</div><div class="line">                    Toast.makeText(<span class="keyword">this</span>,<span class="string">"not bind service"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    ComputerEntity computer = <span class="keyword">new</span> ComputerEntity(<span class="number">3</span>,<span class="string">"hp"</span>,<span class="string">"envy13"</span>);</div><div class="line">                    mRemoteComputerManager.addComputer(computer);</div><div class="line">                    List&lt;ComputerEntity&gt; computerList = mRemoteComputerManager.getComputerList();</div><div class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">0</span>;i&lt;computerList.size();i++)&#123;</div><div class="line">                        String str = <span class="string">"computerId:"</span> + String.valueOf(computerList.get(i).computerId) +</div><div class="line">                                <span class="string">" brand:"</span> + computerList.get(i).brand +</div><div class="line">                                <span class="string">" model:"</span> + computerList.get(i).model ;</div><div class="line">                        TextView textView = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">                        textView.setText(str);</div><div class="line">                        mShowLinear.addView(textView);</div><div class="line">                    &#125;</div><div class="line">                    mRemoteComputerManager.registerUser(mOnComputerArrivedListener);</div><div class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.clear_demo3_btn:</div><div class="line">                mShowLinear.removeAllViews();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">bindService</span><span class="params">()</span></span>&#123;</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent();</div><div class="line">        intent.setAction(<span class="string">"com.ljd.aidl.action.COMPUTER_OBSERVER_SERVICE"</span>);</div><div class="line">        mIsBindService = bindService(intent,mConnection, Context.BIND_AUTO_CREATE);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">unbindService</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span>(!mIsBindService)&#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (mRemoteComputerManager != <span class="keyword">null</span> &amp;&amp; mRemoteComputerManager.asBinder().isBinderAlive())&#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mRemoteComputerManager.unRegisterUser(mOnComputerArrivedListener);</div><div class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        unbindService(mConnection);</div><div class="line">        mIsBindService = <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a><strong><a href="https://github.com/lijiangdong/aidl.git" target="_blank" rel="external">源码下载</a></strong></h1>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ipc/" rel="tag"># ipc</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/20/ipc-02/" rel="prev" title="Android的IPC机制(二)—AIDL实现原理简析">
+                Android的IPC机制(二)—AIDL实现原理简析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODM0MS80OTEz"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="无嘴小呆子" />
+          <p class="site-author-name" itemprop="name">无嘴小呆子</p>
+           
+              <p class="site-description motion-element" itemprop="description">用代码书写这个世界</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lijiangdong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3257022505" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AIDL简介"><span class="nav-number">1.</span> <span class="nav-text">AIDL简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AIDL用法"><span class="nav-number">2.</span> <span class="nav-text">AIDL用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AIDL简单用法"><span class="nav-number">2.1.</span> <span class="nav-text">AIDL简单用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#演示"><span class="nav-number">2.1.1.</span> <span class="nav-text">演示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL代码"><span class="nav-number">2.1.2.</span> <span class="nav-text">AIDL代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端代码"><span class="nav-number">2.1.3.</span> <span class="nav-text">服务端代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端代码"><span class="nav-number">2.1.4.</span> <span class="nav-text">客户端代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AIDL高级用法"><span class="nav-number">2.2.</span> <span class="nav-text">AIDL高级用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL语法规则"><span class="nav-number">2.2.1.</span> <span class="nav-text">AIDL语法规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#演示-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">演示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实体类代码"><span class="nav-number">2.2.3.</span> <span class="nav-text">实体类代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL代码-1"><span class="nav-number">2.2.4.</span> <span class="nav-text">AIDL代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端代码-1"><span class="nav-number">2.2.5.</span> <span class="nav-text">服务端代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端代码-1"><span class="nav-number">2.2.6.</span> <span class="nav-text">客户端代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AIDL用法拓展"><span class="nav-number">2.3.</span> <span class="nav-text">AIDL用法拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#演示-2"><span class="nav-number">2.3.1.</span> <span class="nav-text">演示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AIDL代码-2"><span class="nav-number">2.3.2.</span> <span class="nav-text">AIDL代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端代码-2"><span class="nav-number">2.3.3.</span> <span class="nav-text">服务端代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端代码-2"><span class="nav-number">2.3.4.</span> <span class="nav-text">客户端代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码下载"><span class="nav-number">3.</span> <span class="nav-text">源码下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">无嘴小呆子</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      $('#local-search-input').focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            var resultItems = [];
+            if (this.value.trim().length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCountInArticle = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCountInArticle = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  var resultItem = '';
+
+                  function highlightKeyword(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+
+                    var matchText = text.substring(start, end);
+                    var matchResult = [];
+                    var prevEnd = 0;
+                    while (position + word.length <= end && index.length != 0) {
+
+                      // highlight keyword
+
+                      var wordBegin = position - start;
+                      var wordEnd = position - start + word.length;
+                      matchResult.push(matchText.substring(prevEnd, wordBegin));
+                      matchResult.push("<b class=\"search-keyword\">" + matchText.substring(wordBegin, wordEnd) + "</b>");
+
+                      // move to next position of hit
+
+                      index.pop();
+                      prevEnd = wordEnd;
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (prevEnd > position - start) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    matchResult.push(matchText.substring(prevEnd));
+                    return matchResult.join('');
+                  }
+
+                  // sort index by position of keyword
+
+                  indexOfTitle.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  indexOfContent.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  // highlight title
+
+                  if (indexOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, 0, title.length, indexOfTitle) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  // highlight content
+
+                  var resultUpperBound = parseInt(1);
+                  var withoutUpperBound = false;
+                  if (resultUpperBound === -1) {
+                    withoutUpperBound = true;
+                  }
+                  var currentResultNum = 0;
+                  while (indexOfContent.length != 0 && (withoutUpperBound || (currentResultNum < resultUpperBound))) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                    "<p class=\"search-result\">" + highlightKeyword(content, start, end, indexOfContent) +
+                    "...</p>" + "</a>";
+                    currentResultNum++;
+                  }
+                  resultItem += "</li>";
+                  resultItems.push({item: resultItem, hitCount: hitCountInArticle, id: resultItems.length});
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.hitCount != resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultLeft.id - resultRight.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result, i) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              $resultContent.innerHTML = searchResultList;
+            }
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("WpQBIOFFVk2j3VShGdWrNzdx-gzGzoHsz", "N7O0UNa3oH14UGye19dyCBcm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

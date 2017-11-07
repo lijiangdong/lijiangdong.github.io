@@ -1,0 +1,1211 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ipc," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="在前面的几篇文章中，我们介绍了许多在Android中有关进程间通信的方式，但都是在一个设备上进行的进程间通信，而这时候我们两个应用在不同的设备上的时候，在这个时候我们就不能通过前方介绍的那些方法来解决了。但是我们通过网络进行通信来处理这个问题。今天就来介绍一下Android中网络通信的其中一种方式——Socket。Socket翻译为中文为套接字，而现在套接字也成为了操作系统中的一部分。下面我们">
+<meta name="keywords" content="ipc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android的IPC机制(七)—Socket的原理简析与使用">
+<meta property="og:url" content="http://lijiangdong.github.io/2016/03/06/ipc-07/index.html">
+<meta property="og:site_name" content="李江东">
+<meta property="og:description" content="在前面的几篇文章中，我们介绍了许多在Android中有关进程间通信的方式，但都是在一个设备上进行的进程间通信，而这时候我们两个应用在不同的设备上的时候，在这个时候我们就不能通过前方介绍的那些方法来解决了。但是我们通过网络进行通信来处理这个问题。今天就来介绍一下Android中网络通信的其中一种方式——Socket。Socket翻译为中文为套接字，而现在套接字也成为了操作系统中的一部分。下面我们">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160308114056753">
+<meta property="og:image" content="http://img.blog.csdn.net/20160308132117894">
+<meta property="og:image" content="http://img.blog.csdn.net/20160308150825062">
+<meta property="og:image" content="http://img.blog.csdn.net/20160308150843437">
+<meta property="og:updated_time" content="2017-11-06T14:20:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android的IPC机制(七)—Socket的原理简析与使用">
+<meta name="twitter:description" content="在前面的几篇文章中，我们介绍了许多在Android中有关进程间通信的方式，但都是在一个设备上进行的进程间通信，而这时候我们两个应用在不同的设备上的时候，在这个时候我们就不能通过前方介绍的那些方法来解决了。但是我们通过网络进行通信来处理这个问题。今天就来介绍一下Android中网络通信的其中一种方式——Socket。Socket翻译为中文为套接字，而现在套接字也成为了操作系统中的一部分。下面我们">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160308114056753">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://lijiangdong.github.io/2016/03/06/ipc-07/"/>
+
+
+
+
+
+  <title>Android的IPC机制(七)—Socket的原理简析与使用 | 李江东</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75a5108fa849298412266b0c02b04616";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李江东</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://lijiangdong.github.io/2016/03/06/ipc-07/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="无嘴小呆子">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李江东">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android的IPC机制(七)—Socket的原理简析与使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-06T20:54:00+08:00">
+                2016-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/03/06/ipc-07/" class="leancloud_visitors" data-flag-title="Android的IPC机制(七)—Socket的原理简析与使用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　在前面的几篇文章中，我们介绍了许多在Android中有关进程间通信的方式，但都是在一个设备上进行的进程间通信，而这时候我们两个应用在不同的设备上的时候，在这个时候我们就不能通过前方介绍的那些方法来解决了。但是我们通过网络进行通信来处理这个问题。今天就来介绍一下Android中网络通信的其中一种方式——Socket。Socket翻译为中文为套接字，而现在套接字也成为了操作系统中的一部分。下面我们就来看一下如何使用这个套接字的。<a id="more"></a></p>
+<h1 id="TCP-IP介绍"><a href="#TCP-IP介绍" class="headerlink" title="TCP/IP介绍"></a><strong>TCP/IP介绍</strong></h1><p>　　这里有一点需要说明一下，在Internet所使用的各种协议中，最重要的和最著名的就是TCP和IP两个协议。而我们现在经常提到的TCP/IP并不一定单指TCP和IP这两个具体的协议，而往往表示Internet所使用的整个TCP/IP协议族。</p>
+<h2 id="TCP-IP的体系结构"><a href="#TCP-IP的体系结构" class="headerlink" title="TCP/IP的体系结构"></a><strong>TCP/IP的体系结构</strong></h2><p>　　TCP/IP协议可以为各式各样的应用提供服务，同时TCP/IP协议也允许IP协议在各式各样的网络构成的互联网上运行。TCP/IP协议是一个四层的体系结构，它包含应用层、传输层、网络层、网络接口层。在传输层中主要使用的有两种协议：TCP（Transmission Control Protocol，传输控制协议）和UDP（User Datagram Protocol，用户数据报协议）。下面是TCP/IP体系结构示意图。<br><img src="http://img.blog.csdn.net/20160308114056753" alt="这里写图片描述"></p>
+<h2 id="传输控制协议TCP"><a href="#传输控制协议TCP" class="headerlink" title="传输控制协议TCP"></a><strong>传输控制协议TCP</strong></h2><p>　　TCP是TCP/IP体系中非常复杂的一个协议，在这里我们简单看一下TCP协议的特点，对于TCP协议的详细内容，可以查看一些计算机网络的相关书籍。</p>
+<ol>
+<li>TCP是面向连接传输协议，也就是说在我们的应用程序在使用TCP协议之前，必须先建立起TCP连接。在传送数据完毕后，必须释放已经建立的TCP连接。就像我们打电话一样，打电话之前首先需要拨号进行建立连接，等通话结束后再挂断释放连接。</li>
+<li>每一条TCP连接只能有两个端点，每一条TCP连接只能是点对点的。</li>
+<li>TCP提供了一个可靠交付的服务，也就是说通过TCP连接传送的数据，无差错，不丢失，不重复，并且按序到达。</li>
+<li>TCP提供全双工通信，它允许通信双方的应用进程在任何时候都能够发送数据。</li>
+<li>TCP通信中是面向字节流的，其中的“流”指的是流入到进程或从进程流出的字节序列。<h2 id="用户数据报协议UDP"><a href="#用户数据报协议UDP" class="headerlink" title="用户数据报协议UDP"></a><strong>用户数据报协议UDP</strong></h2>　　用户数据报协议UDP只是在IP的数据服务上增加了很少的一点功能（复用、分用的功能以及差错检测的功能）。在这里简单说一下UDP的特点。</li>
+<li>UDP是无连接，也就是在发送数据之前是不需要建立连接的，也就减少了开销和发送数据之间的延时。</li>
+<li>UDP它只能是尽最大努力地交付，也就是不能够保证可靠交付。</li>
+<li>UDP它是面向报文的。发送方的UDP对应用程序交下来的报文，再添加首部后就向下交付给IP层。</li>
+<li>UDP它没有拥塞控制，也就是说在网络出现拥塞的情况下不会使源主机的发送速率降低。</li>
+<li>UDP支持一对一，一对多，多对一和多对多的交互通信。<h2 id="Socket在TCP-IP中的作用"><a href="#Socket在TCP-IP中的作用" class="headerlink" title="Socket在TCP/IP中的作用"></a><strong>Socket在TCP/IP中的作用</strong></h2>　　Socket是工作于TCP/IP协议中应用层和传输层之间的一种抽象（不属于应用层也不属于传输层）。在Android系统中，它可以分为流套接字（streamsocket）和数据报套接字(datagramsocket)。而Socket中的流套接字将TCP协议作为其端对端协议，提供了一个可信赖的字节流服务；数据报套接字使用UDP协议，提供数据打包发送服务。<br>　　在网络编程的时候，我们经常把Socket作为应用进程和传输层协议之间的接口。在下面图中表示了这样一个概念。在图中我们假定了运输层使用的是TCP协议（如果使用的是UDP协议，情况也是类似的，只是UDP是无连接的通信的两端依然可以用两个套接字来标志）。并且现在套接字已经成为操作系统内核的一部分。<br><img src="http://img.blog.csdn.net/20160308132117894" alt="这里写图片描述"><br>　　不过有一点我们要注意，在套接字以上的进程是受应用程序控制的，而在套接字以下的的传输层协议软件则是由计算机操作系统控制。因此，只要我们的应用程序使用TCP/IP协议进行通信，它就必须通过Socket与操作系统交互并请求服务。从这里可以看出来，我们对Socket以上的应用进程具有完全的控制，但对Socket以下的传输层却只有很少的控制。例如，我们可以选择传输层协议（TCP或UDP）和一些传输层的参数（如最大缓存空间和最大报文长度）。<h1 id="Socket使用案例"><a href="#Socket使用案例" class="headerlink" title="Socket使用案例"></a><strong>Socket使用案例</strong></h1>　　在这里我们选择传输层协议为TCP协议，也就是我们将使用流套接字作为例子进行举例说明。现在我们现在做一个聊天室功能。在这里我们创建两个应用程序，分别运行在两个不同的设备上。首先看一下效果图。<h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a><strong>演示</strong></h2></li>
+</ol>
+<div><img src="http://img.blog.csdn.net/20160308150825062" width="300">&amp;nbsp&amp;nbsp&amp;nbsp&amp;nbsp<br><img src="http://img.blog.csdn.net/20160308150843437" width="298"></div>
+
+<h2 id="客户端代码"><a href="#客户端代码" class="headerlink" title="客户端代码"></a><strong>客户端代码</strong></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.example.ljd.socketclient;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.annotation.SuppressLint;</div><div class="line"><span class="keyword">import</span> android.os.Handler;</div><div class="line"><span class="keyword">import</span> android.os.Message;</div><div class="line"><span class="keyword">import</span> android.os.SystemClock;</div><div class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</div><div class="line"><span class="keyword">import</span> android.os.Bundle;</div><div class="line"><span class="keyword">import</span> android.text.TextUtils;</div><div class="line"><span class="keyword">import</span> android.view.View;</div><div class="line"><span class="keyword">import</span> android.widget.EditText;</div><div class="line"><span class="keyword">import</span> android.widget.LinearLayout;</div><div class="line"><span class="keyword">import</span> android.widget.TextView;</div><div class="line"><span class="keyword">import</span> android.widget.Toast;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.BufferedReader;</div><div class="line"><span class="keyword">import</span> java.io.BufferedWriter;</div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.InputStreamReader;</div><div class="line"><span class="keyword">import</span> java.io.OutputStreamWriter;</div><div class="line"><span class="keyword">import</span> java.io.PrintWriter;</div><div class="line"><span class="keyword">import</span> java.net.Socket;</div><div class="line"><span class="keyword">import</span> java.sql.Date;</div><div class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</div><div class="line"></div><div class="line"><span class="keyword">import</span> butterknife.Bind;</div><div class="line"><span class="keyword">import</span> butterknife.ButterKnife;</div><div class="line"><span class="keyword">import</span> butterknife.OnClick;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> RECEIVE_NEW_MESSAGE = <span class="number">1</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SOCKET_CONNECT_SUCCESS = <span class="number">2</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SOCKET_CONNECT_FAIL = <span class="number">3</span>;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.msg_edit_text)</div><div class="line">    EditText mMessageEditText;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.show_linear)</div><div class="line">    LinearLayout mShowLinear;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> PrintWriter mPrintWriter;</div><div class="line">    <span class="keyword">private</span> Socket mClientSocket;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> mIsConnectServer = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">    <span class="meta">@SuppressLint</span>(<span class="string">"HandlerLeak"</span>)</div><div class="line">    <span class="keyword">private</span> Handler mHandler = <span class="keyword">new</span> Handler() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what) &#123;</div><div class="line"></div><div class="line">                <span class="keyword">case</span> RECEIVE_NEW_MESSAGE:</div><div class="line">                    TextView textView = <span class="keyword">new</span> TextView(MainActivity.<span class="keyword">this</span>);</div><div class="line">                    textView.setText((String)msg.obj);</div><div class="line">                    mShowLinear.addView(textView);</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line"></div><div class="line">                <span class="keyword">case</span> SOCKET_CONNECT_SUCCESS:</div><div class="line">                    Toast.makeText(MainActivity.<span class="keyword">this</span>,<span class="string">"连接服务端成功"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line"></div><div class="line">                <span class="keyword">case</span> SOCKET_CONNECT_FAIL:</div><div class="line">                    Toast.makeText(MainActivity.<span class="keyword">this</span>,<span class="string">"连接服务端失败，请重新尝试"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">default</span>:</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_main);</div><div class="line">        ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        ButterKnife.unbind(<span class="keyword">this</span>);</div><div class="line">        disConnectServer();</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(&#123;R.id.send_btn,R.id.connect_btn,R.id.disconnect_btn&#125;)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickButton</span><span class="params">(View v)</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">switch</span> (v.getId())&#123;</div><div class="line">            <span class="keyword">case</span> R.id.send_btn:</div><div class="line">                sendMessageToServer();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.connect_btn:</div><div class="line">                <span class="keyword">new</span> Thread() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                        connectServer();</div><div class="line">                    &#125;</div><div class="line">                &#125;.start();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            <span class="keyword">case</span> R.id.disconnect_btn:</div><div class="line">                Toast.makeText(MainActivity.<span class="keyword">this</span>,<span class="string">"已经断开连接"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">                disConnectServer();</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getTime</span><span class="params">(<span class="keyword">long</span> time)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="string">"(HH:mm:ss)"</span>).format(<span class="keyword">new</span> Date(time));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">connectServer</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (mIsConnectServer)</div><div class="line">            <span class="keyword">return</span>;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</div><div class="line">        <span class="keyword">while</span> (mClientSocket == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mClientSocket = <span class="keyword">new</span> Socket(<span class="string">"10.10.14.160"</span>, <span class="number">8088</span>);</div><div class="line">                mPrintWriter = <span class="keyword">new</span> PrintWriter(<span class="keyword">new</span> BufferedWriter(</div><div class="line">                        <span class="keyword">new</span> OutputStreamWriter(mClientSocket.getOutputStream())), <span class="keyword">true</span>);</div><div class="line">                mIsConnectServer = <span class="keyword">true</span>;</div><div class="line">                mHandler.obtainMessage(SOCKET_CONNECT_SUCCESS).sendToTarget();</div><div class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                SystemClock.sleep(<span class="number">1000</span>);</div><div class="line">                count++;</div><div class="line">                <span class="keyword">if</span> (count == <span class="number">5</span>)&#123;</div><div class="line">                    mHandler.obtainMessage(SOCKET_CONNECT_FAIL).sendToTarget();</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 接收服务器端的消息</span></div><div class="line">            BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(</div><div class="line">                    mClientSocket.getInputStream()));</div><div class="line">            <span class="keyword">while</span> (!MainActivity.<span class="keyword">this</span>.isFinishing()) &#123;</div><div class="line">                String msg = bufferedReader.readLine();</div><div class="line">                <span class="keyword">if</span> (msg != <span class="keyword">null</span>) &#123;</div><div class="line">                    String time = getTime(System.currentTimeMillis());</div><div class="line">                    <span class="keyword">final</span> String showedMsg = <span class="string">"server "</span> + time + <span class="string">":"</span> + msg;</div><div class="line">                    mHandler.obtainMessage(RECEIVE_NEW_MESSAGE, showedMsg)</div><div class="line">                            .sendToTarget();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            mPrintWriter.close();</div><div class="line">            bufferedReader.close();</div><div class="line">            mClientSocket.close();</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">disConnectServer</span><span class="params">()</span></span>&#123;</div><div class="line">        mIsConnectServer = <span class="keyword">false</span>;</div><div class="line">        <span class="keyword">if</span> (mClientSocket != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mClientSocket.shutdownInput();</div><div class="line">                mClientSocket.close();</div><div class="line">                mClientSocket = <span class="keyword">null</span>;</div><div class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendMessageToServer</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span> (!mIsConnectServer)&#123;</div><div class="line">            Toast.makeText(<span class="keyword">this</span>,<span class="string">"没有连接上服务端，请重新连接"</span>,Toast.LENGTH_SHORT).show();</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">final</span> String msg = mMessageEditText.getText().toString();</div><div class="line">        <span class="keyword">if</span> (!TextUtils.isEmpty(msg) &amp;&amp; mPrintWriter != <span class="keyword">null</span>) &#123;</div><div class="line">            mPrintWriter.println(msg);</div><div class="line">            mMessageEditText.setText(<span class="string">""</span>);</div><div class="line">            String time = getTime(System.currentTimeMillis());</div><div class="line">            <span class="keyword">final</span> String showedMsg = <span class="string">"client "</span> + time + <span class="string">":"</span> + msg;</div><div class="line">            TextView textView = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">            textView.setText(showedMsg);</div><div class="line">            mShowLinear.addView(textView);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="客户端布局代码"><a href="#客户端布局代码" class="headerlink" title="客户端布局代码"></a><strong>客户端布局代码</strong></h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">    <span class="attr">android:orientation</span>=<span class="string">"vertical"</span></span></div><div class="line"><span class="tag">    <span class="attr">android:padding</span>=<span class="string">"5dp"</span></span></div><div class="line"><span class="tag">    &gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">ScrollView</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"0dp"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_weight</span>=<span class="string">"1"</span> &gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">LinearLayout</span></span></div><div class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">"@+id/show_linear"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:orientation</span>=<span class="string">"vertical"</span> &gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ScrollView</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">LinearLayout</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:orientation</span>=<span class="string">"horizontal"</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">EditText</span></span></div><div class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">"@+id/msg_edit_text"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"0dp"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_gravity</span>=<span class="string">"bottom"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_weight</span>=<span class="string">"1"</span></span></div><div class="line"><span class="tag">            /&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">Button</span></span></div><div class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">"@+id/send_btn"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:text</span>=<span class="string">"发送"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">LinearLayout</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">        <span class="attr">android:orientation</span>=<span class="string">"horizontal"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">Button</span></span></div><div class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">"@+id/connect_btn"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"0dp"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_weight</span>=<span class="string">"1"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:text</span>=<span class="string">"连接"</span>/&gt;</span></div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">Button</span></span></div><div class="line"><span class="tag">            <span class="attr">android:id</span>=<span class="string">"@+id/disconnect_btn"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_width</span>=<span class="string">"0dp"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_weight</span>=<span class="string">"1"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></div><div class="line"><span class="tag">            <span class="attr">android:text</span>=<span class="string">"断开连接"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码　"></a><strong>服务端代码</strong>　</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.example.ljd.socketserver;</div><div class="line"></div><div class="line"><span class="keyword">import</span> android.os.Handler;</div><div class="line"><span class="keyword">import</span> android.os.Message;</div><div class="line"><span class="keyword">import</span> android.support.v7.app.AppCompatActivity;</div><div class="line"><span class="keyword">import</span> android.os.Bundle;</div><div class="line"><span class="keyword">import</span> android.text.TextUtils;</div><div class="line"><span class="keyword">import</span> android.widget.EditText;</div><div class="line"><span class="keyword">import</span> android.widget.LinearLayout;</div><div class="line"><span class="keyword">import</span> android.widget.TextView;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.BufferedReader;</div><div class="line"><span class="keyword">import</span> java.io.BufferedWriter;</div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.InputStreamReader;</div><div class="line"><span class="keyword">import</span> java.io.OutputStreamWriter;</div><div class="line"><span class="keyword">import</span> java.io.PrintWriter;</div><div class="line"><span class="keyword">import</span> java.net.ServerSocket;</div><div class="line"><span class="keyword">import</span> java.net.Socket;</div><div class="line"><span class="keyword">import</span> java.sql.Date;</div><div class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">import</span> butterknife.Bind;</div><div class="line"><span class="keyword">import</span> butterknife.ButterKnife;</div><div class="line"><span class="keyword">import</span> butterknife.OnClick;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.show_linear)</div><div class="line">    LinearLayout mShowLinear;</div><div class="line"></div><div class="line">    <span class="meta">@Bind</span>(R.id.msg_edit_text)</div><div class="line">    EditText mMessageEditText;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> ServerSocket mServerSocket;</div><div class="line">    <span class="keyword">private</span> PrintWriter mPrintWriter;</div><div class="line">    <span class="keyword">private</span> Handler mHandler = <span class="keyword">new</span> Handler() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> (msg.what == <span class="number">0</span>)&#123;</div><div class="line">                TextView textView = <span class="keyword">new</span> TextView(MainActivity.<span class="keyword">this</span>);</div><div class="line">                textView.setText((String)msg.obj);</div><div class="line">                mShowLinear.addView(textView);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_main);</div><div class="line">        ButterKnife.bind(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            mServerSocket = <span class="keyword">new</span> ServerSocket(<span class="number">8088</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> AcceptClient()).start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        ButterKnife.unbind(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">if</span> (mServerSocket != <span class="keyword">null</span>)&#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mServerSocket.close();</div><div class="line">                mServerSocket = <span class="keyword">null</span>;</div><div class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@OnClick</span>(R.id.send_btn)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickButton</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">final</span> String msg = mMessageEditText.getText().toString();</div><div class="line">        <span class="keyword">if</span> (!TextUtils.isEmpty(msg) &amp;&amp; mPrintWriter != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="comment">//将消息写入到流中</span></div><div class="line">            mPrintWriter.println(msg);</div><div class="line">            mMessageEditText.setText(<span class="string">""</span>);</div><div class="line">            String time = getTime(System.currentTimeMillis());</div><div class="line">            <span class="keyword">final</span> String showedMsg = <span class="string">"server "</span> + time + <span class="string">":"</span> + msg;</div><div class="line">            TextView textView = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">            textView.setText(showedMsg);</div><div class="line">            mShowLinear.addView(textView);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getTime</span><span class="params">(<span class="keyword">long</span> time)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="string">"(HH:mm:ss)"</span>).format(<span class="keyword">new</span> Date(time));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">AcceptClient</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                Socket clientSocket = <span class="keyword">null</span>;</div><div class="line">                <span class="keyword">while</span> (clientSocket == <span class="keyword">null</span>)&#123;</div><div class="line">                    clientSocket = mServerSocket.accept();</div><div class="line">                    mPrintWriter = <span class="keyword">new</span> PrintWriter(<span class="keyword">new</span> BufferedWriter(</div><div class="line">                            <span class="keyword">new</span> OutputStreamWriter(clientSocket.getOutputStream())), <span class="keyword">true</span>);</div><div class="line">                &#125;</div><div class="line">                BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(</div><div class="line">                        clientSocket.getInputStream()));</div><div class="line">                <span class="keyword">while</span> (!MainActivity.<span class="keyword">this</span>.isFinishing()) &#123;</div><div class="line">                    <span class="comment">//读取客户端发来的消息</span></div><div class="line">                    String msg = bufferedReader.readLine();</div><div class="line">                    <span class="keyword">if</span> (msg != <span class="keyword">null</span>) &#123;</div><div class="line">                        String time = getTime(System.currentTimeMillis());</div><div class="line">                        <span class="keyword">final</span> String showedMsg = <span class="string">"client "</span> + time + <span class="string">":"</span> + msg;</div><div class="line">                        mHandler.obtainMessage(<span class="number">0</span>, showedMsg)</div><div class="line">                                .sendToTarget();</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                bufferedReader.close();</div><div class="line">                clientSocket.close();</div><div class="line">                mPrintWriter.close();</div><div class="line"></div><div class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="服务端布局代码"><a href="#服务端布局代码" class="headerlink" title="服务端布局代码"></a><strong>服务端布局代码</strong></h2><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">&lt;LinearLayout xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></div><div class="line">    android:layout_width=<span class="string">"match_parent"</span></div><div class="line">    android:layout_height=<span class="string">"match_parent"</span></div><div class="line">    android:orientation=<span class="string">"vertical"</span></div><div class="line">    android:padding=<span class="string">"5dp"</span></div><div class="line">    &gt;</div><div class="line"></div><div class="line">    &lt;ScrollView</div><div class="line">        android:layout_width=<span class="string">"match_parent"</span></div><div class="line">        android:layout_height=<span class="string">"0dp"</span></div><div class="line">        android:layout_weight=<span class="string">"1"</span> &gt;</div><div class="line"></div><div class="line">        &lt;LinearLayout</div><div class="line">            android:id=<span class="string">"@+id/show_linear"</span></div><div class="line">            android:layout_width=<span class="string">"match_parent"</span></div><div class="line">            android:layout_height=<span class="string">"wrap_content"</span></div><div class="line">            android:orientation=<span class="string">"vertical"</span> &gt;</div><div class="line">        &lt;/LinearLayout&gt;</div><div class="line">    &lt;/ScrollView&gt;</div><div class="line"></div><div class="line">    &lt;LinearLayout</div><div class="line">        android:layout_width=<span class="string">"match_parent"</span></div><div class="line">        android:layout_height=<span class="string">"wrap_content"</span></div><div class="line">        android:orientation=<span class="string">"horizontal"</span>&gt;</div><div class="line"></div><div class="line">        &lt;EditText</div><div class="line">            android:id=<span class="string">"@+id/msg_edit_text"</span></div><div class="line">            android:layout_width=<span class="string">"0dp"</span></div><div class="line">            android:layout_gravity=<span class="string">"bottom"</span></div><div class="line">            android:layout_height=<span class="string">"wrap_content"</span></div><div class="line">            android:layout_weight=<span class="string">"1"</span></div><div class="line">            /&gt;</div><div class="line"></div><div class="line">        &lt;Button</div><div class="line">            android:id=<span class="string">"@+id/send_btn"</span></div><div class="line">            android:layout_width=<span class="string">"wrap_content"</span></div><div class="line">            android:layout_height=<span class="string">"wrap_content"</span></div><div class="line">            android:text=<span class="string">"发送"</span> /&gt;</div><div class="line">    &lt;/LinearLayout&gt;</div><div class="line"></div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure>
+<h2 id="添加权限"><a href="#添加权限" class="headerlink" title="添加权限"></a><strong>添加权限</strong></h2><p>　　在客户端与服务端应用中我们还需要添加一些权限<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.ACCESS_NETWORK_STATE"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.INTERNET"</span> /&gt;</span></div></pre></td></tr></table></figure></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h1><p>　　在网络通信中我们除了socket我们最常用的还有一种方式那就是http通信，而http连接采用的是”请求—响应方式“，也就是说只有当客户端发出请求时，服务端才能够向客户端返回数据。在这里我们就不在详细介绍。对于Android的IPC机制就说到这里了，当然还有其他方式可以进行跨进程通信，我们可以自行研究了。</p>
+<h1 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a><strong><a href="https://github.com/lijiangdong/socket" target="_blank" rel="external">源码下载</a></strong></h1>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ipc/" rel="tag"># ipc</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/29/ipc-06/" rel="next" title="Android的IPC机制(六)—BroadcastReceiver的使用">
+                <i class="fa fa-chevron-left"></i> Android的IPC机制(六)—BroadcastReceiver的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/12/eventbus3.0-use/" rel="prev" title="EventBus3.0使用详解">
+                EventBus3.0使用详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODM0MS80OTEz"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="无嘴小呆子" />
+          <p class="site-author-name" itemprop="name">无嘴小呆子</p>
+           
+              <p class="site-description motion-element" itemprop="description">用代码书写这个世界</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lijiangdong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3257022505" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP-IP介绍"><span class="nav-number">1.</span> <span class="nav-text">TCP/IP介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-IP的体系结构"><span class="nav-number">1.1.</span> <span class="nav-text">TCP/IP的体系结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传输控制协议TCP"><span class="nav-number">1.2.</span> <span class="nav-text">传输控制协议TCP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户数据报协议UDP"><span class="nav-number">1.3.</span> <span class="nav-text">用户数据报协议UDP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket在TCP-IP中的作用"><span class="nav-number">1.4.</span> <span class="nav-text">Socket在TCP/IP中的作用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Socket使用案例"><span class="nav-number">2.</span> <span class="nav-text">Socket使用案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#演示"><span class="nav-number">2.1.</span> <span class="nav-text">演示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端代码"><span class="nav-number">2.2.</span> <span class="nav-text">客户端代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端布局代码"><span class="nav-number">2.3.</span> <span class="nav-text">客户端布局代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端代码"><span class="nav-number">2.4.</span> <span class="nav-text">服务端代码　</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端布局代码"><span class="nav-number">2.5.</span> <span class="nav-text">服务端布局代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加权限"><span class="nav-number">2.6.</span> <span class="nav-text">添加权限</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码下载"><span class="nav-number">4.</span> <span class="nav-text">源码下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">无嘴小呆子</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      $('#local-search-input').focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            var resultItems = [];
+            if (this.value.trim().length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCountInArticle = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCountInArticle = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  var resultItem = '';
+
+                  function highlightKeyword(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+
+                    var matchText = text.substring(start, end);
+                    var matchResult = [];
+                    var prevEnd = 0;
+                    while (position + word.length <= end && index.length != 0) {
+
+                      // highlight keyword
+
+                      var wordBegin = position - start;
+                      var wordEnd = position - start + word.length;
+                      matchResult.push(matchText.substring(prevEnd, wordBegin));
+                      matchResult.push("<b class=\"search-keyword\">" + matchText.substring(wordBegin, wordEnd) + "</b>");
+
+                      // move to next position of hit
+
+                      index.pop();
+                      prevEnd = wordEnd;
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (prevEnd > position - start) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    matchResult.push(matchText.substring(prevEnd));
+                    return matchResult.join('');
+                  }
+
+                  // sort index by position of keyword
+
+                  indexOfTitle.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  indexOfContent.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  // highlight title
+
+                  if (indexOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, 0, title.length, indexOfTitle) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  // highlight content
+
+                  var resultUpperBound = parseInt(1);
+                  var withoutUpperBound = false;
+                  if (resultUpperBound === -1) {
+                    withoutUpperBound = true;
+                  }
+                  var currentResultNum = 0;
+                  while (indexOfContent.length != 0 && (withoutUpperBound || (currentResultNum < resultUpperBound))) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                    "<p class=\"search-result\">" + highlightKeyword(content, start, end, indexOfContent) +
+                    "...</p>" + "</a>";
+                    currentResultNum++;
+                  }
+                  resultItem += "</li>";
+                  resultItems.push({item: resultItem, hitCount: hitCountInArticle, id: resultItems.length});
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.hitCount != resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultLeft.id - resultRight.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result, i) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              $resultContent.innerHTML = searchResultList;
+            }
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("WpQBIOFFVk2j3VShGdWrNzdx-gzGzoHsz", "N7O0UNa3oH14UGye19dyCBcm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
