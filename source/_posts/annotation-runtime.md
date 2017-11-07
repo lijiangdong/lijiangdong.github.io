@@ -4,7 +4,6 @@ date: 2016-06-04 21:40
 category: [Java]
 tags: [Annotation]
 comments: true
-visible: hide
 ---
 
 　　注解（Annotation）也被称为元数据(Metadata)，是在Java SE 5中提供的一个新特性。Annotation可以用来修饰类，属性，方法。在Java中，除了使用系统内置的Annotation以外，用户还能够通过自定义Annotation来实现所需要的功能。下面就来看一下如何使用自定义的Annotation。<!--more-->
