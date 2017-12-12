@@ -26,7 +26,9 @@ comments: true
 
 >[root@centos ~] \# passwd
 
-# 创建新用户
+# 创建新用户以及授权
+
+## 创建新用户
 
 创建一个用户名
 >[root@centos ~]\# adduser lijiangdong
@@ -34,7 +36,7 @@ comments: true
 更改用户的密码
 >[root@centos ~]\# passwd lijiangdong
 
-# 新用户授权
+## 新用户授权
 
 新创建的用户并不能使用sudo命令，需要给他添加授权。
 
