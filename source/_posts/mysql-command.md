@@ -10,13 +10,12 @@ comments: true
 
 > mysql -u root -p
 
-
 2.mysql导出整个数据库
-
 
 >mysqldump -u 用户名 -p 数据库名 > 导出的文件名 </br>
 mysqldump -u dbuser -p dbname > dbname.sql
 
+<!--more-->
 
 3.导入数据库(Linux)
 

@@ -16,6 +16,8 @@ comments: true
 
 > \#hostnamectl set-hostname name
 
+<!--more-->
+
 3.再通过hostname或者hostnamectl status命令查看更改是否生效
 
 > \#hostnamectl status
