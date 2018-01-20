@@ -1,4 +1,12 @@
 
+---
+title:  忘记mysql密码
+date: 2017-01-20 16:50 
+category: [mysql]
+tags: [mysql]
+comments: true
+---
+
 修改/etc/my.conf: 
 > \# vi /etc/my.cnf
 
