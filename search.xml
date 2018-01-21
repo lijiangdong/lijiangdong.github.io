@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Linux常用命令]]></title>
+    <url>%2F2017%2F12%2F12%2Flinux-command%2F</url>
+    <content type="text"><![CDATA[CentOS修改主机名1.查看当前主机名 #hostname 2.修改命令 #hostnamectl set-hostname name 3.再通过hostname或者hostnamectl status命令查看更改是否生效 #hostnamectl status 修改root用户密码 [root@centos ~] # passwd 创建新用户以及授权创建新用户创建一个用户名 [root@centos ~]# adduser lijiangdong 更改用户的密码 [root@centos ~]# passwd lijiangdong 新用户授权新创建的用户并不能使用sudo命令，需要给他添加授权。 sudo命令的授权管理是在sudoers文件里 [root@localhost ~]# sudoers -bash: sudoers: 未找到命令 找到sudoers命令 [root@localhost ~]# whereis sudoerssudoers: /etc/sudoers /etc/sudoers.d /usr/libexec/sudoers.so /usr/share/man/man5/sudoers.5.gz 查看权限 [root@localhost ~]# ls -l /etc/sudoers -r–r—– 1 root root 3907 6月 23 03:42 /etc/sudoers 只有r权限，添加w权限 [root@localhost ~]# chmod -v u+w /etc/sudoers &lt;\br&gt;mode of “/etc/sudoers” changed from 0440 (r–r—–) to 0640 (rw-r—–) 追加新用户 [root@localhost ~]# vim /etc/sudoers 添加以下内容，wq保存123## Allow root to run any commands anywhere root ALL=(ALL) ALLlijiangdong ALL=(ALL) ALL 将w权限回收 [root@localhost ~]# chmod -v u-w /etc/sudoers &lt;\br&gt;mode of ‘/etc/sudoers’ changed from 0640 (rw-r—–) to 0440 (r–r—–)]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>CentOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Mysql常用命令]]></title>
+    <url>%2F2017%2F12%2F11%2Fmysql-command%2F</url>
+    <content type="text"><![CDATA[登录 mysql -u root -p mysql导出整个数据库 mysqldump -u 用户名 -p 数据库名 &gt; 导出的文件名mysqldump -u dbuser -p dbname &gt; dbname.sql 导入数据库(Linux)（1）首先建空数据库 mysql&gt;create database abc; （2）选择数据库 mysql&gt;use abc; （3）设置数据库编码 mysql&gt;set names utf8; （4）导入数据（注意sql文件的路径） mysql&gt;source /home/abc/abc.sql; mysql忘记密码修改/etc/my.conf: # vi /etc/my.cnf 在[mysqld]的段中加上一句：skip-grant-tables 保存并且退出vi。 重新启动mysqldservice mysqld restart 1234mysql&gt; USE mysql;&lt;/br&gt; mysql&gt; update mysql.user set authentication_string=password(&apos;root&apos;) where user=&apos;root&apos;;mysql&gt; flush privileges ;mysql&gt; quit 将MySQL的登录设置修改回来 # vi /etc/my.cnf 将刚才在[mysqld]的段中加上的skip-grant-tables删除,保存并且退出vi。 重新启动mysqldservice mysqld restart]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[忘记mysql密码]]></title>
+    <url>%2F2017%2F01%2F20%2Fforget_mysql_root_password%2F</url>
+    <content type="text"><![CDATA[修改/etc/my.conf: # vi /etc/my.cnf 在[mysqld]的段中加上一句：skip-grant-tables 保存并且退出vi。 重新启动mysqldservice mysqld restart 1234mysql&gt; USE mysql;&lt;/br&gt; mysql&gt; update mysql.user set authentication_string=password(&apos;root&apos;) where user=&apos;root&apos;;mysql&gt; flush privileges ;mysql&gt; quit 将MySQL的登录设置修改回来 # vi /etc/my.cnf 将刚才在[mysqld]的段中加上的skip-grant-tables删除,保存并且退出vi。 重新启动mysqldservice mysqld restart]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Android稳定性测试工具Monkey的使用]]></title>
     <url>%2F2017%2F01%2F15%2Fmonkey%2F</url>
     <content type="text"><![CDATA[Monkey是一个命令行工具，它可以运行在我们的模拟器或者设备当中。它可以发送一些伪随机（pseudo-random）的用户事件流，例如点击，触摸，手势等。我们能够使用Monkey工具来对我们所开发的应用进行压力测试。Monkey测试是一种为了测试软件的稳定性，健壮性的快速有效的方法。 Monkey程序介绍 Monkey是Android自带的系统工具，是由java语言编写。他在Android文件系统存放的路径是：/system/framework/monkey.jar启动moneky.jar的shell脚本文件在Android文件系统存放的路径为：/system/bin/monkey。打开这个monkey文件我们可以看一下这个脚本文件很简单。1234567# Script to start "monkey" on the device, which has a very rudimentary# shell.#base=/systemexport CLASSPATH=$base/framework/monkey.jartrap "" HUPexec app_process $base/bin com.android.commands.monkey.Monkey $* 我们可以看到他调用的是com.android.commands.monkey.Monkey包。 Monkey常用命令 下面我们就来执行这个monkey脚本。我们执行如下命令。1adb shell monkey 这时候，monkey将以无反馈模式进行启动，并把事件任意发送到安装在目标环境下中的全部包。运行结果如下所示。1234567891011121314151617181920212223242526LiJiangdongdeMacBook-Pro:~ lijiangdong$ adb shell monkeyusage: monkey [-p ALLOWED_PACKAGE [-p ALLOWED_PACKAGE] ...] [-c MAIN_CATEGORY [-c MAIN_CATEGORY] ...] [--ignore-crashes] [--ignore-timeouts] [--ignore-security-exceptions] [--monitor-native-crashes] [--ignore-native-crashes] [--kill-process-after-error] [--hprof] [--pct-touch PERCENT] [--pct-motion PERCENT] [--pct-trackball PERCENT] [--pct-syskeys PERCENT] [--pct-nav PERCENT] [--pct-majornav PERCENT] [--pct-appswitch PERCENT] [--pct-flip PERCENT] [--pct-anyevent PERCENT] [--pct-pinchzoom PERCENT] [--pkg-blacklist-file PACKAGE_BLACKLIST_FILE] [--pkg-whitelist-file PACKAGE_WHITELIST_FILE] [--wait-dbg] [--dbg-no-events] [--setup scriptfile] [-f scriptfile [-f scriptfile] ...] [--port port] [-s SEED] [-v [-v] ...] [--throttle MILLISEC] [--randomize-throttle] [--profile-wait MILLISEC] [--device-sleep-time MILLISEC] [--randomize-script] [--script-log] [--bugreport] [--periodic-bugreport] COUNT 这时候可以看到monkey并没有运行起来，只是显示了usage，这是因为少了一个重要的参数，这是指发送的事件数。如果我们需要发送500个随机事件，执行如下命令。1adb shell monkey 500 这时候我们可以看到手机已经疯狂的运行起来了。moneky的基本语法为1$ adb shell monkey [options] &lt;event-count&gt; monkey的option操作都是根据具体需求设定的，主要分为常规类，事件类，约束类和调试类。下面就对这些命令进行说明。 Category Option Description 常规类 –help 显示moneky参数帮助信息usage -v 打印日志信息，每个-v将增加反馈信息的级别。-v越多日志信息就会越详细，不过目前最多支持三个-v。Level0：一个-v，除启动提示、测试完成和最终结果之外，提供较少信息。Level1：两个-v，提供较为详细的测试信息，如逐个发送到Activity的事件。Level2：三个-v，提供更加详细的设置信息，如测试中被选中的或未被选中的Activity。 事件类 -s &lt;seed&gt; 伪随机数生成器的seed值。如果用相同的seed值再次运行 Monkey，它将生成相同的事件序列。 –throttle &lt;milliseconds&gt; 后面接时间，单位为毫秒，表示事件之间的固定延时（即执行每一个指令的间隔时间），若不接这个选项，monkey则不会延时 –pct-touch &lt;percent&gt; 后面接触摸事件的百分比。(触摸事件是一个down-up事件，它发生在屏幕上的某单一位置) –pct-motion &lt;percent&gt; 后面接动作事件的百分比。(动作事件由屏幕上某处的一个down事件、一系列的伪随机事件和一个up事件组成)。 –pct-trackball &lt;percent&gt; 后面接轨迹事件的百分比(轨迹事件由一个或几个随机的移动组成，有时还伴随有点击)。 –pct-nav &lt;percent&gt; 后面接“基本”导航事件百分比(导航事件主要来自方向输入设备的上，下，左，右事件) –pct-majornav &lt;percent&gt; 后面接“主要”导航事件的百分比(这些导航事件通常引发图形界面中的动作，如：5-way键盘的中间按键、回退按键、菜单按键) –pct-syskeys &lt;percent&gt; 后面接“系统”按键事件的百分比(这些按键通常被保留，由系统使用，如Home、Back、StartCall、End Call及音量控制键)。 –pct-appswitch &lt;percent&gt; 后面接启动Activity的百分比。在随机间隔里，Monkey将执行一个startActivity()调用，作为最大程度覆盖包中全部Activity的一种方法。 –pct-anyevent &lt;percent&gt; 调整其它类型事件的百分比。它包罗了所有其它类型的事件，如：按键、其它不常用的设备按钮、等等。 约束类 -p &lt;allowed-package-name&gt; 如果用此参数指定了一个或几个包，Monkey将只允许系统启动这些包里的Activity。如果你的应用程序还需要访问其它包里的Activity(如选择取一个联系人)，那些包也需要在此同时指定。如果不指定任何包，Monkey将允许系统启动全部包里的Activity。要指定多个包，需要使用多个-p选项，每个-p选项只能用于一个包。 -c &lt;main-category&gt; 如果用此参数指定了一个或几个类别，Monkey将只允许系统启动被这些类别中的某个类别列出的Activity。如果不指定任何类别，Monkey将选择下列类别中列出的Activity：Intent.CATEGORY_LAUNCHER或Intent.CATEGORY_MONKEY。要指定多个类别，需要使用多个-c选项，每个-c选项只能用于一个类别。 调试类 –dbg-no-events 设置此选项，Monkey将执行初始启动，进入到一个测试Activity，然后不会再进一步生成事件。为了得到最佳结果，把它与-v、一个或几个包约束、以及一个保持Monkey运行30秒或更长时间的非零值联合起来，从而提供一个环境，可以监视应用程序所调用的包之间的转换。 –hprof 设置此选项，将在Monkey事件序列之前和之后立即生成profiling报告。这将会在data/misc中生成大文件(~5Mb)，所以要小心使用它。 –ignore-crashes 通常，当应用程序崩溃或发生任何失控异常时，Monkey将停止运行。如果设置此选项，Monkey将继续向系统发送事件，直到计数完成。 –ignore-timeouts 通常，当应用程序发生任何超时错误(如“ApplicationNot Responding”对话框)时，Monkey将停止运行。如果设置此选项，Monkey将继续向系统发送事件，直到计数完成。 –ignore-security-exceptions]]></content>
