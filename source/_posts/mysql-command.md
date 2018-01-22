@@ -5,7 +5,7 @@ category: [数据库]
 tags: [mysql]
 comments: true
 ---
-
+需要关闭防火墙
 # 登录
 
 > mysql -u root -p
