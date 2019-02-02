@@ -308,7 +308,7 @@ public class AddEditTaskFragment extends Fragment implements AddEditTaskContract
 　　我们注意到View层的实现是通过Fragment来完成的。对于View的实现为什么要采用Fragment而不是Activity。来看一下官方是如何解释的。
 
 
- >> The separation between Activity and Fragment fits nicely with this implementation of MVP: the Activity is the overall controller that creates and connects views and presenters.
+ > The separation between Activity and Fragment fits nicely with this implementation of MVP: the Activity is the overall controller that creates and connects views and presenters.
 Tablet layout or screens with multiple views take advantage of the Fragments framework.
 
 　　在这里官方对于采用Fragment的原因给出了两种解释。
