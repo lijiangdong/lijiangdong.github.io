@@ -1,0 +1,1041 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="retrofit是由square公司开发的。square在github上发布了很多优秀的Android开源项目。例如:otto(事件总线),leakcanary(排查内存泄露),android-times-square(日历控件),dagger(依赖注入),picasso(异步加载图片),okhttp(网络请求),retrofit(网络请求)等等。更多square上的开源项目我们可以去squa">
+<meta name="keywords" content="retrofit">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Retrofit2.0使用详解">
+<meta property="og:url" content="http://lijiangdong.github.io/draft/trash/retrofit2.0-use.html">
+<meta property="og:site_name" content="无嘴小呆子">
+<meta property="og:description" content="retrofit是由square公司开发的。square在github上发布了很多优秀的Android开源项目。例如:otto(事件总线),leakcanary(排查内存泄露),android-times-square(日历控件),dagger(依赖注入),picasso(异步加载图片),okhttp(网络请求),retrofit(网络请求)等等。更多square上的开源项目我们可以去squa">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20160331234336311">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402093530309">
+<meta property="og:image" content="http://img.blog.csdn.net/20160403112125709">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402190927032">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402204610320">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402214100544">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402215006782">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402215347799">
+<meta property="og:image" content="http://img.blog.csdn.net/20160402223902582">
+<meta property="og:image" content="http://img.blog.csdn.net/20160403110118763">
+<meta property="og:image" content="http://img.blog.csdn.net/20160403111155611">
+<meta property="og:updated_time" content="2019-02-03T05:21:27.482Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Retrofit2.0使用详解">
+<meta name="twitter:description" content="retrofit是由square公司开发的。square在github上发布了很多优秀的Android开源项目。例如:otto(事件总线),leakcanary(排查内存泄露),android-times-square(日历控件),dagger(依赖注入),picasso(异步加载图片),okhttp(网络请求),retrofit(网络请求)等等。更多square上的开源项目我们可以去squa">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160331234336311">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://lijiangdong.github.io/draft/trash/retrofit2.0-use.html"/>
+
+
+
+
+
+  <title>Retrofit2.0使用详解 | 无嘴小呆子</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75a5108fa849298412266b0c02b04616";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left  ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无嘴小呆子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+  <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">Retrofit2.0使用详解</h1>
+
+
+
+</header>
+
+    
+    
+      <p>　　retrofit是由square公司开发的。square在github上发布了很多优秀的Android开源项目。例如:<a href="https://github.com/square/otto" target="_blank" rel="external">otto</a>(事件总线),<a href="https://github.com/square/leakcanary" target="_blank" rel="external">leakcanary</a>(排查内存泄露),<a href="https://github.com/square/android-times-square" target="_blank" rel="external">android-times-square</a>(日历控件),<a href="https://github.com/square/dagger" target="_blank" rel="external">dagger</a>(依赖注入),<a href="https://github.com/square/picasso" target="_blank" rel="external">picasso</a>(异步加载图片),<a href="https://github.com/square/okhttp" target="_blank" rel="external">okhttp</a>(网络请求),<a href="https://github.com/square/retrofit" target="_blank" rel="external">retrofit</a>(网络请求)等等。更多square上的开源项目我们可以去<a href="https://github.com/square" target="_blank" rel="external">square的GitHub</a>进行查看。这次就来介绍一下retrofit的一些基本用法。retrofit是REST安卓客户端请求库。使用retrofit可以进行GET，POST，PUT，DELETE等请求方式。下面就来看一下retrofit的基本用法。<a id="more"></a></p>
+<h1 id="Retrofit使用方法"><a href="#Retrofit使用方法" class="headerlink" title="Retrofit使用方法"></a><strong>Retrofit使用方法</strong></h1><p>　　由于retrofit2.0与先前版本的差别还是比较大，对于不同版本之间的差异在这里就不在进行详细区别。下面的例子也是针对于retrofit2.0进行介绍的。retrofit2.0它依赖于OkHttp,而且这部分也不再支持替换。在这里我们也不需要显示的导入okHttp,在retrofit中已经导入okhttp3。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.squareup.okhttp3<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mockwebserver<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>　　在下面的例子当中采用与GitHub一些相关api进行演示。在这里首先需要添加访问网络的权限。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.INTERNET"</span>/&gt;</span></div></pre></td></tr></table></figure></p>
+<h2 id="简单示例"><a href="#简单示例" class="headerlink" title="简单示例"></a><strong>简单示例</strong></h2><h3 id="添加Gradle依赖项"><a href="#添加Gradle依赖项" class="headerlink" title="添加Gradle依赖项"></a><strong>添加Gradle依赖项</strong></h3><p>　　在这里我们最好查看一下<a href="http://square.github.io/retrofit/" target="_blank" rel="external">retrofit的官网</a>添加最新依赖。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">compile <span class="string">'com.squareup.retrofit2:retrofit:2.0.1'</span></div></pre></td></tr></table></figure></p>
+<h3 id="创建API接口"><a href="#创建API接口" class="headerlink" title="创建API接口"></a><strong>创建API接口</strong></h3><p>　　在retrofit中通过一个Java接口作为http请求的api接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubApi</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@GET</span>(<span class="string">"repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">    <span class="function">Call&lt;ResponseBody&gt; <span class="title">contributorsBySimpleGetCall</span><span class="params">(@Path(<span class="string">"owner"</span>)</span> String owner, @<span class="title">Path</span><span class="params">(<span class="string">"repo"</span>)</span> String repo)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="创建retrofit实例"><a href="#创建retrofit实例" class="headerlink" title="创建retrofit实例"></a><strong>创建retrofit实例</strong></h3><p>　　在这里baseUrl是在创建retrofit实力的时候定义的，我们也可以在API接口中定义完整的url。在这里建议在创建baseUrl中以”/“结尾，在API中不以”/“开头和结尾。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">        .baseUrl(<span class="string">"https://api.github.com/"</span>)</div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
+<h3 id="调用API接口"><a href="#调用API接口" class="headerlink" title="调用API接口"></a><strong>调用API接口</strong></h3><p>　　在调用API接口请求后，获得一个json字符串，通过Gson进行解析，获得login以及contributions。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">GitHubApi repo = retrofit.create(GitHubApi.class);</div><div class="line"></div><div class="line">    Call&lt;ResponseBody&gt; call = repo.contributorsBySimpleGetCall(mUserName, mRepo);</div><div class="line">call.enqueue(<span class="keyword">new</span> Callback&lt;ResponseBody&gt;() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call&lt;ResponseBody&gt; call, Response&lt;ResponseBody&gt; response)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Gson gson = <span class="keyword">new</span> Gson();</div><div class="line">            ArrayList&lt;Contributor&gt; contributorsList = gson.fromJson(response.body().string(), <span class="keyword">new</span> TypeToken&lt;List&lt;Contributor&gt;&gt;()&#123;&#125;.getType());</div><div class="line">            <span class="keyword">for</span> (Contributor contributor : contributorsList)&#123;</div><div class="line">                Log.d(<span class="string">"login"</span>,contributor.getLogin());</div><div class="line">                Log.d(<span class="string">"contributions"</span>,contributor.getContributions()+<span class="string">""</span>);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call&lt;ResponseBody&gt; call, Throwable t)</span> </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<h3 id="效果展示"><a href="#效果展示" class="headerlink" title="效果展示"></a><strong>效果展示</strong></h3><p>　　这样就完成了一个http请求，上面请求的完整地址为：<a href="https://api.github.com/repos/square/retrofit/contributors" target="_blank" rel="external">https://api.github.com/repos/square/retrofit/contributors</a><br>　　然后我们看一下运行结果:<br><img src="http://img.blog.csdn.net/20160331234336311" alt="这里写图片描述"></p>
+<h2 id="取消请求"><a href="#取消请求" class="headerlink" title="取消请求"></a><strong>取消请求</strong></h2><p>　　我们可以终止一个请求。终止操作是对底层的httpclient执行cancel操作。即使是正在执行的请求，也能够立即终止。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">call.cancel();</div></pre></td></tr></table></figure></p>
+<h2 id="转换器"><a href="#转换器" class="headerlink" title="转换器"></a><strong>转换器</strong></h2><p>　　在上面的例子中通过获取ResponseBody后，我们自己使用Gson来解析接收到的Json格式数据。在Retrofit中当创建一个Retrofit实例的时候可以为其添加一个Json转换器，这样就会自动将Json格式的响应体转换为所需要的Java对象。那么先来看一下如何根据已有的Json格式数据如何生成Java对象。当然我们可以根据已知的数据手动创建Java对象，也可以通过工具更具Json格式为我们自动生成Java对象。</p>
+<h3 id="自动生成Java对象"><a href="#自动生成Java对象" class="headerlink" title="自动生成Java对象"></a><strong>自动生成Java对象</strong></h3><p>　　在这里介绍两种根据Json数据自动生成Java对象的工具。</p>
+<h4 id="jsonschema2pojo"><a href="#jsonschema2pojo" class="headerlink" title="jsonschema2pojo"></a><strong>jsonschema2pojo</strong></h4><p>　　可以通过访问<a href="http://www.jsonschema2pojo.org/" target="_blank" rel="external">jsonschema2pojo</a>网站。先来看一下它的使用方法。<br><img src="http://img.blog.csdn.net/20160402093530309" alt="这里写图片描述"><br>　　上面配置中所选注解若是使用的Gson解析，可以选择Gson，当然没有也是可以的。对于@Generated注解若是需要保留的话添加如下依赖，也可以直接删除@Generated注解，没有任何影响。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">compile <span class="string">'org.glassfish:javax.annotation:10.0-b28'</span></div></pre></td></tr></table></figure></p>
+<h4 id="GsonFormat"><a href="#GsonFormat" class="headerlink" title="GsonFormat"></a><strong>GsonFormat</strong></h4><p>　　GsonFormat是AndroidStudio中的一个插件，在AndroidStudio的插件选项中直接搜索安装这个插件即可。在这里看一下是如何使用这个插件的。<br><img src="http://img.blog.csdn.net/20160403112125709" alt="这里写图片描述"></p>
+<h3 id="添加转换器"><a href="#添加转换器" class="headerlink" title="添加转换器"></a><strong>添加转换器</strong></h3><p>　　在这里我们需要为retrofit添加gson转换器的依赖。添加过converter-gson后不用再添加gson库。在converter-gson中已经包含gson。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">compile <span class="string">'com.squareup.retrofit2:converter-gson:2.0.1'</span></div></pre></td></tr></table></figure></p>
+<p>　　在这里先创建一个Java类Contributor，用来保存接收到的数据。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Contributor</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> String login;</div><div class="line">    <span class="keyword">private</span> Integer contributions;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getLogin</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> login;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setLogin</span><span class="params">(String login)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.login = login;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getContributions</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> contributions;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContributions</span><span class="params">(Integer contributions)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.contributions = contributions;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　这时候修改我们的API接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">Call&lt;List&lt;Contributor&gt;&gt; contributorsByAddConverterGetCall(<span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner, <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div></pre></td></tr></table></figure></p>
+<p>　　创建retrofit实例，我们通过addConverterFactory指定一个factory来对响应反序列化，在这里converters被添加的顺序将是它们被Retrofit尝试的顺序。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">        .baseUrl(<span class="string">"https://api.github.com/"</span>)</div><div class="line">        .addConverterFactory(GsonConverterFactory.create())</div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
+<p>　　调用上面所修改的API接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">GitHubApi repo = retrofit.create(GitHubApi.class);</div><div class="line">Call&lt;List&lt;Contributor&gt;&gt; call = repo.contributorsByAddConverterGetCall(mUserName, mRepo);</div><div class="line">call.enqueue(<span class="keyword">new</span> Callback&lt;List&lt;Contributor&gt;&gt;() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call&lt;List&lt;Contributor&gt;&gt; call, Response&lt;List&lt;Contributor&gt;&gt; response)</span> </span>&#123;</div><div class="line">        List&lt;Contributor&gt; contributorList = response.body();</div><div class="line">        <span class="keyword">for</span> (Contributor contributor : contributorList)&#123;</div><div class="line">            Log.d(<span class="string">"login"</span>, contributor.getLogin());</div><div class="line">            Log.d(<span class="string">"contributions"</span>, contributor.getContributions() + <span class="string">""</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call&lt;List&lt;Contributor&gt;&gt; call, Throwable t)</span> </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>　　最后在来看一下运行结果。<br><img src="http://img.blog.csdn.net/20160402190927032" alt="这里写图片描述"><br>　　retrofit不仅仅只支持gson，还支持其他许多json解析库。以下版本号需要与retrofit版本号保持一致，并且以retrofit官网给出的版本号为准。</p>
+<ul><br><li><a href="https://github.com/google/gson" target="_blank" rel="external">Gson</a>: <code>compile ‘com.squareup.retrofit2:converter-gson:2.0.1’</code></li><br><li><a href="http://wiki.fasterxml.com/JacksonHome" target="_blank" rel="external">Jackson</a>: <code>compile ‘com.squareup.retrofit2:converter-jackson:2.0.1’</code></li><br><li><a href="https://github.com/square/moshi/" target="_blank" rel="external">Moshi</a>: <code>compile ‘com.squareup.retrofit2:converter-moshi:2.0.1’</code></li><br><li><a href="https://developers.google.com/protocol-buffers/" target="_blank" rel="external">Protobuf</a>: <code>compile ‘com.squareup.retrofit2:converter-protobuf:2.0.1’</code></li><br><li><a href="https://github.com/square/wire" target="_blank" rel="external">Wire</a>: <code>compile ‘com.squareup.retrofit2:converter-wire:2.0.1’</code></li><br><li><a href="http://simple.sourceforge.net/" target="_blank" rel="external">Simple XML</a>: <code>compile ‘com.squareup.retrofit2:converter-simplexml:2.0.1’</code></li><br></ul>
+
+<h2 id="增加日志信息"><a href="#增加日志信息" class="headerlink" title="增加日志信息"></a><strong>增加日志信息</strong></h2><p>　　在retrofit2.0中是没有日志功能的。但是retrofit2.0中依赖OkHttp，所以也就能够通过OkHttp中的interceptor来实现实际的底层的请求和响应日志。在这里我们需要修改上一个retrofit实例，为其自定自定义的OkHttpClient。代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">HttpLoggingInterceptor httpLoggingInterceptor = <span class="keyword">new</span> HttpLoggingInterceptor();</div><div class="line">httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);</div><div class="line">OkHttpClient okHttpClient = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">        .addInterceptor(httpLoggingInterceptor)</div><div class="line">        .build();</div><div class="line"></div><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())</div><div class="line">        .client(okHttpClient)</div><div class="line">        .baseUrl(<span class="string">"https://api.github.com/"</span>)</div><div class="line">        .addConverterFactory(GsonConverterFactory.create())</div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
+<p>　　还需要添加如下依赖。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">compile <span class="string">'com.squareup.okhttp3:logging-interceptor:3.1.2'</span></div></pre></td></tr></table></figure></p>
+<p>　　其他代码没有任何变化，我们来看一下运行结果。<br><img src="http://img.blog.csdn.net/20160402204610320" alt="这里写图片描述"></p>
+<h2 id="添加请求头"><a href="#添加请求头" class="headerlink" title="添加请求头"></a><strong>添加请求头</strong></h2><p>　　我们可以通过@Headers来添加请求头。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Headers</span>(&#123;</div><div class="line">        <span class="string">"Accept: application/vnd.github.v3.full+json"</span>,</div><div class="line">        <span class="string">"User-Agent: RetrofitBean-Sample-App"</span>,</div><div class="line">        <span class="string">"name:ljd"</span></div><div class="line">&#125;)</div><div class="line"><span class="meta">@GET</span>(<span class="string">"repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">Call&lt;List&lt;Contributor&gt;&gt; contributorsAndAddHeader(<span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,<span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div></pre></td></tr></table></figure></p>
+<p>　　运行结果。<br><img src="http://img.blog.csdn.net/20160402214100544" alt="这里写图片描述"></p>
+<h2 id="同步请求"><a href="#同步请求" class="headerlink" title="同步请求"></a><strong>同步请求</strong></h2><p>　　在这里我们可以直接通过call.execute()执行一个同步请求，由于不允许在主线程中进行网络请求操作，所以我们需要再子线程中进行执行。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Response&lt;List&lt;Contributor&gt;&gt; response = call.execute();</div><div class="line">            List&lt;Contributor&gt; contributorsList = response.body();</div><div class="line">            <span class="keyword">for</span> (Contributor contributor : contributorsList)&#123;</div><div class="line">                Log.d(<span class="string">"login"</span>,contributor.getLogin());</div><div class="line">                Log.d(<span class="string">"contributions"</span>,contributor.getContributions()+<span class="string">""</span>);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;).start();</div></pre></td></tr></table></figure></p>
+<p>　　在这里看一下运行结果。<br><img src="http://img.blog.csdn.net/20160402215006782" alt="这里写图片描述"></p>
+<h2 id="clone"><a href="#clone" class="headerlink" title="clone"></a><strong>clone</strong></h2><p>　　在这里无论是同步操作还是异步操作每一个call对象实例只能被执行一次。多次执行抛出如下异常。<br><img src="http://img.blog.csdn.net/20160402215347799" alt="这里写图片描述"><br>　　在这里如果我们的request和respone都是一一对应的。我们通过Clone方法创建一个一模一样的实例，并且它的开销也是很小的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Call&lt;List&lt;Contributor&gt;&gt; cloneCall = call.clone();</div><div class="line">cloneCall.execute();</div></pre></td></tr></table></figure></p>
+<h2 id="get请求"><a href="#get请求" class="headerlink" title="get请求"></a><strong>get请求</strong></h2><p>　　在前面的一些例子当中我们都是采用get请求。当然我们也可以为URL指定查询参数。使用@Query即可。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"search/repositories"</span>)</div><div class="line"><span class="function">Call&lt;RetrofitBean&gt; <span class="title">queryRetrofitByGetCall</span><span class="params">(@Query(<span class="string">"q"</span>)</span>String owner,</span></div><div class="line"><span class="function">                                      @<span class="title">Query</span><span class="params">(<span class="string">"since"</span>)</span>String time,</span></div><div class="line"><span class="function">                                      @<span class="title">Query</span><span class="params">(<span class="string">"page"</span>)</span><span class="keyword">int</span> page,</span></div><div class="line"><span class="function">                                      @<span class="title">Query</span><span class="params">(<span class="string">"per_page"</span>)</span><span class="keyword">int</span> per_Page)</span>;</div></pre></td></tr></table></figure></p>
+<p>　　当我们的参数过多的时候我们可以通过@QueryMap注解和map对象参数来指定每个表单项的Key，value的值。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"search/repositories"</span>)</div><div class="line"><span class="function">Call&lt;RetrofitBean&gt; <span class="title">queryRetrofitByGetCallMap</span><span class="params">(@QueryMap Map&lt;String,String&gt; map)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>　　下面的call对象实例为上面api中所返回call对象。更具所返回的json数据所创建的实体类在这里就不在贴出代码，下载源码详细查看。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">call.enqueue(<span class="keyword">new</span> Callback&lt;RetrofitBean&gt;() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call&lt;RetrofitBean&gt; call, Response&lt;RetrofitBean&gt; response)</span> </span>&#123;</div><div class="line">        RetrofitBean retrofit = response.body();</div><div class="line">        List&lt;Item&gt; list = retrofit.getItems();</div><div class="line">        <span class="keyword">if</span> (list == <span class="keyword">null</span>)</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        Log.d(TAG, <span class="string">"total:"</span> + retrofit.getTotalCount());</div><div class="line">        Log.d(TAG, <span class="string">"incompleteResults:"</span> + retrofit.getIncompleteResults());</div><div class="line">        Log.d(TAG, <span class="string">"----------------------"</span>);</div><div class="line">        <span class="keyword">for</span> (Item item : list) &#123;</div><div class="line">            Log.d(TAG, <span class="string">"name:"</span> + item.getName());</div><div class="line">            Log.d(TAG, <span class="string">"full_name:"</span> + item.getFull_name());</div><div class="line">            Log.d(TAG, <span class="string">"description:"</span> + item.getDescription());</div><div class="line">            Owner owner = item.getOwner();</div><div class="line">            Log.d(TAG, <span class="string">"login:"</span> + owner.getLogin());</div><div class="line">            Log.d(TAG, <span class="string">"type:"</span> + owner.getType());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call&lt;RetrofitBean&gt; call, Throwable t)</span> </span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>　　上面请求中的完整连接为: <a href="https://api.github.com/search/repositories?q=retrofit&amp;since=2016-03-29&amp;page=1&amp;per_page=3" target="_blank" rel="external">https://api.github.com/search/repositories?q=retrofit&amp;since=2016-03-29&amp;page=1&amp;per_page=3</a><br><img src="http://img.blog.csdn.net/20160402223902582" alt="这里写图片描述"></p>
+<p>　　在Retrofit 2.0添加了一个新的注解：@Url，它允许我们直接传入一个请求的URL。这样以来我们可以将上一个请求的获得的url直接传入进来。方便了我们的操作。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">Call&lt;List&lt;Contributor&gt;&gt; repoContributorsPaginate(<span class="meta">@Url</span> String url);</div></pre></td></tr></table></figure></p>
+<h2 id="Form-encoded和Multipart"><a href="#Form-encoded和Multipart" class="headerlink" title="Form encoded和Multipart"></a><strong>Form encoded和Multipart</strong></h2><h3 id="Form-encoded"><a href="#Form-encoded" class="headerlink" title="Form encoded"></a><strong>Form encoded</strong></h3><p>　　我们可以使用@FormUrlEncoded注解来发送表单数据。使用 @Field注解和参数来指定每个表单项的Key，value为参数的值。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FormUrlEncoded</span></div><div class="line"><span class="meta">@POST</span>(<span class="string">"user/edit"</span>)</div><div class="line"><span class="function">Call&lt;User&gt; <span class="title">updateUser</span><span class="params">(@Field(<span class="string">"first_name"</span>)</span> String first, @<span class="title">Field</span><span class="params">(<span class="string">"last_name"</span>)</span> String last)</span>;</div></pre></td></tr></table></figure></p>
+<p>　　当我们有很多个表单参数时可以通过@FieldMap注解和Map对象参数来指定每个表单项的Key，value的值。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@FormUrlEncoded</span></div><div class="line"><span class="meta">@POST</span>(<span class="string">"user/edit"</span>)</div><div class="line"><span class="function">Call&lt;User&gt; <span class="title">updateUser</span><span class="params">(@FieldMap Map&lt;String,String&gt; fieldMap)</span></span>;</div></pre></td></tr></table></figure></p>
+<h3 id="Multipart"><a href="#Multipart" class="headerlink" title="Multipart"></a><strong>Multipart</strong></h3><p>　　我们还可以通过@Multipart注解来发送Multipart数据。通过@Part注解来定义需要发送的文件。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Multipart</span></div><div class="line"><span class="meta">@PUT</span>(<span class="string">"/user/photo"</span>)</div><div class="line"><span class="function">User <span class="title">updateUser</span><span class="params">(@Part(<span class="string">"photo"</span>)</span> TypedFile photo, @<span class="title">Part</span><span class="params">(<span class="string">"description"</span>)</span> TypedString description)</span>;</div></pre></td></tr></table></figure></p>
+<h2 id="Retrofit与RxJava结合"><a href="#Retrofit与RxJava结合" class="headerlink" title="Retrofit与RxJava结合"></a><strong>Retrofit与RxJava结合</strong></h2><p>　　Retrofit能够与RxJava进行完美结合。下面就来看一下Retrofit与RxJava是如何结合在一起的。对于RxJava在这就不在进行详细介绍，对于RXJava的使用可以参考附录里面给出链接。<br>　　首先我们需要添加如下依赖。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">compile <span class="string">'com.squareup.retrofit2:adapter-rxjava:2.0.1'</span></div><div class="line">compile <span class="string">'io.reactivex:rxandroid:1.1.0'</span></div></pre></td></tr></table></figure></p>
+<p>　　创建retrofit对象实例时，通过addCallAdapterFactory来添加对RxJava的支持。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">HttpLoggingInterceptor httpLoggingInterceptor = <span class="keyword">new</span> HttpLoggingInterceptor();</div><div class="line">httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);</div><div class="line">OkHttpClient okHttpClient = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">        .addInterceptor(httpLoggingInterceptor)</div><div class="line">        .build();</div><div class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</div><div class="line">        .client(okHttpClient)</div><div class="line">        .addCallAdapterFactory(RxJavaCallAdapterFactory.create())</div><div class="line">        .addConverterFactory(GsonConverterFactory.create())</div><div class="line">        .baseUrl(<span class="string">"https://api.github.com/"</span>)</div><div class="line">        .build();</div></pre></td></tr></table></figure></p>
+<p>　　使用Observable创建一个API接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">Observable&lt;List&lt;Contributor&gt;&gt; contributorsByRxJava(<span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,<span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div></pre></td></tr></table></figure></p>
+<p>　　下面来调用这个API接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> CompositeSubscription mSubscriptions = <span class="keyword">new</span> CompositeSubscription();</div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">mSubscriptions.add(</div><div class="line">        mGitHubService.contributorsByRxJava(mUserName, mRepo)</div><div class="line">                .subscribeOn(Schedulers.io())</div><div class="line">                .observeOn(AndroidSchedulers.mainThread())</div><div class="line">                .subscribe(<span class="keyword">new</span> Observer&lt;List&lt;Contributor&gt;&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(List&lt;Contributor&gt; contributors)</span> </span>&#123;</div><div class="line">                        <span class="keyword">for</span> (Contributor c : contributors) &#123;</div><div class="line">                            Log.d(<span class="string">"TAG"</span>, <span class="string">"login:"</span> + c.getLogin() + <span class="string">"  contributions:"</span> + c.getContributions());</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;));</div></pre></td></tr></table></figure>
+<p>　　下面来看一下运行结果。<br><img src="http://img.blog.csdn.net/20160403110118763" alt="这里写图片描述"><br>　　如果我们想要查看所有contributor的信息，首先我们需要向gitHub请求获取到所有contributor，然后再通过获得contributor进行依次向github请求获取contributor的信息，在这时候我们使用RxJava也就非常方便了。下面看一下如何操作的。<br>　　首先再添加一个API接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span>(<span class="string">"repos/&#123;owner&#125;/&#123;repo&#125;/contributors"</span>)</div><div class="line">Observable&lt;List&lt;Contributor&gt;&gt; contributorsByRxJava(<span class="meta">@Path</span>(<span class="string">"owner"</span>) String owner,</div><div class="line">                                                   <span class="meta">@Path</span>(<span class="string">"repo"</span>) String repo);</div></pre></td></tr></table></figure></p>
+<p>　　下面在看一下是如何进行根据获得的contributor来查看contributor的信息。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">mSubscriptions.add(mGitHubService.contributorsByRxJava(mUserName, mRepo)</div><div class="line">        .flatMap(<span class="keyword">new</span> Func1&lt;List&lt;Contributor&gt;, Observable&lt;Contributor&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Observable&lt;Contributor&gt; <span class="title">call</span><span class="params">(List&lt;Contributor&gt; contributors)</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> Observable.from(contributors);</div><div class="line">            &#125;</div><div class="line">        &#125;)</div><div class="line">        .flatMap(<span class="keyword">new</span> Func1&lt;Contributor, Observable&lt;Pair&lt;User, Contributor&gt;&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> Observable&lt;Pair&lt;User, Contributor&gt;&gt; call(Contributor contributor) &#123;</div><div class="line">                Observable&lt;User&gt; userObservable = mGitHubService.userByRxJava(contributor.getLogin())</div><div class="line">                        .filter(<span class="keyword">new</span> Func1&lt;User, Boolean&gt;() &#123;</div><div class="line">                            <span class="meta">@Override</span></div><div class="line">                            <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(User user)</span> </span>&#123;</div><div class="line">                                <span class="keyword">return</span> !isEmpty(user.getName()) &amp;&amp; !isEmpty(user.getEmail());</div><div class="line">                            &#125;</div><div class="line">                        &#125;);</div><div class="line"></div><div class="line">                <span class="keyword">return</span> Observable.zip(userObservable,</div><div class="line">                        Observable.just(contributor),</div><div class="line">                        <span class="keyword">new</span> Func2&lt;User, Contributor, Pair&lt;User, Contributor&gt;&gt;() &#123;</div><div class="line">                            <span class="meta">@Override</span></div><div class="line">                            <span class="function"><span class="keyword">public</span> Pair&lt;User, Contributor&gt; <span class="title">call</span><span class="params">(User user, Contributor contributor)</span> </span>&#123;</div><div class="line">                                <span class="keyword">return</span> <span class="keyword">new</span> Pair&lt;&gt;(user, contributor);</div><div class="line">                            &#125;</div><div class="line">                        &#125;);</div><div class="line">            &#125;</div><div class="line">        &#125;)</div><div class="line">        .subscribeOn(Schedulers.newThread())</div><div class="line">        .observeOn(AndroidSchedulers.mainThread())</div><div class="line">        .subscribe(<span class="keyword">new</span> Observer&lt;Pair&lt;User, Contributor&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(Pair&lt;User, Contributor&gt; pair)</span> </span>&#123;</div><div class="line">                User user = pair.first;</div><div class="line">                Contributor contributor = pair.second;</div><div class="line">                Log.d(TAG, <span class="string">"name:"</span> + user.getName());</div><div class="line">                Log.d(TAG, <span class="string">"contributions:"</span> + contributor.getContributions());</div><div class="line">                Log.d(TAG, <span class="string">"email:"</span> + user.getEmail());</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;));</div></pre></td></tr></table></figure></p>
+<p>　　最后在来看下运行结果。<br><img src="http://img.blog.csdn.net/20160403111155611" alt="这里写图片描述"></p>
+<h2 id="Retrofit设置缓存"><a href="#Retrofit设置缓存" class="headerlink" title="Retrofit设置缓存"></a><strong>Retrofit设置缓存</strong></h2><p>对Retrofit设置缓存，由于Retrofit是对OkHttp的封装，所以我们可以直接通过OkHttpClient着手。也就是为OkHttp设置缓存。设置缓存代码如下所示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> OkHttpClient <span class="title">getCacheOkHttpClient</span><span class="params">(Context context)</span></span>&#123;</div><div class="line">    <span class="keyword">final</span> File baseDir = context.getCacheDir();</div><div class="line">    <span class="keyword">final</span> File cacheDir = <span class="keyword">new</span> File(baseDir, <span class="string">"HttpResponseCache"</span>);</div><div class="line">    Timber.e(cacheDir.getAbsolutePath());</div><div class="line">    Cache cache = <span class="keyword">new</span> Cache(cacheDir, <span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>);   <span class="comment">//缓存可用大小为10M</span></div><div class="line"></div><div class="line">    Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = chain -&gt; &#123;</div><div class="line">        Request request = chain.request();</div><div class="line">        <span class="keyword">if</span>(!NetWorkUtils.isNetWorkAvailable(context))&#123;</div><div class="line">            request = request.newBuilder()</div><div class="line">                    .cacheControl(CacheControl.FORCE_CACHE)</div><div class="line">                    .build();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Response originalResponse = chain.proceed(request);</div><div class="line">        <span class="keyword">if</span> (NetWorkUtils.isNetWorkAvailable(context)) &#123;</div><div class="line">            <span class="keyword">int</span> maxAge = <span class="number">60</span>;                  <span class="comment">//在线缓存一分钟</span></div><div class="line">            <span class="keyword">return</span> originalResponse.newBuilder()</div><div class="line">                    .removeHeader(<span class="string">"Pragma"</span>)</div><div class="line">                    .removeHeader(<span class="string">"Cache-Control"</span>)</div><div class="line">                    .header(<span class="string">"Cache-Control"</span>, <span class="string">"public, max-age="</span> + maxAge)</div><div class="line">                    .build();</div><div class="line"></div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">int</span> maxStale = <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span> * <span class="number">4</span> * <span class="number">7</span>;     <span class="comment">//离线缓存4周</span></div><div class="line">            <span class="keyword">return</span> originalResponse.newBuilder()</div><div class="line">                    .removeHeader(<span class="string">"Pragma"</span>)</div><div class="line">                    .removeHeader(<span class="string">"Cache-Control"</span>)</div><div class="line">                    .header(<span class="string">"Cache-Control"</span>, <span class="string">"public, only-if-cached, max-stale="</span> + maxStale)</div><div class="line">                    .build();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">            .addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)</div><div class="line">            .addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)</div><div class="line">            .cache(cache)</div><div class="line">            .build();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h1><p>　　在retrofit的使用中，对于文件你上传与下载，并没有为我们提供进度更新的接口，在这里就需要我们自己处理了。在下面的例子中给出一个文件下载的例子，并且对下载进度更新通过logcat打印出来。可以下载进行查看。到这里retrofit的基本用法也就介绍完了，对于retrofit更多的好处在使用中我们可以慢慢体会。</p>
+<h1 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a><strong><a href="https://github.com/lijiangdong/retrofit-example" target="_blank" rel="external">源码下载</a></strong></h1><h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a><strong>附录</strong></h1><ul>
+<li><a href="http://square.github.io/retrofit/" target="_blank" rel="external">Retrofit官方文档</a></li>
+<li><a href="https://realm.io/cn/news/droidcon-jake-wharton-simple-http-retrofit-2/" target="_blank" rel="external">用 Retrofit 2 简化 HTTP 请求</a></li>
+<li><a href="http://gank.io/post/560e15be2dca930e00da1083" target="_blank" rel="external">给 Android 开发者的 RxJava 详解</a></li>
+<li><a href="http://rxjava.yuxingxin.com/" target="_blank" rel="external">RxJava Essentials 中文翻译版</a></li>
+</ul>
+
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODM0MS80OTEz"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="李江东" />
+          <p class="site-author-name" itemprop="name">李江东</p>
+           
+              <p class="site-description motion-element" itemprop="description">用代码书写这个世界</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lijiangdong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3257022505" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李江东</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      $('#local-search-input').focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            var resultItems = [];
+            if (this.value.trim().length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCountInArticle = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCountInArticle = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  var resultItem = '';
+
+                  function highlightKeyword(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+
+                    var matchText = text.substring(start, end);
+                    var matchResult = [];
+                    var prevEnd = 0;
+                    while (position + word.length <= end && index.length != 0) {
+
+                      // highlight keyword
+
+                      var wordBegin = position - start;
+                      var wordEnd = position - start + word.length;
+                      matchResult.push(matchText.substring(prevEnd, wordBegin));
+                      matchResult.push("<b class=\"search-keyword\">" + matchText.substring(wordBegin, wordEnd) + "</b>");
+
+                      // move to next position of hit
+
+                      index.pop();
+                      prevEnd = wordEnd;
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (prevEnd > position - start) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    matchResult.push(matchText.substring(prevEnd));
+                    return matchResult.join('');
+                  }
+
+                  // sort index by position of keyword
+
+                  indexOfTitle.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  indexOfContent.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  // highlight title
+
+                  if (indexOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, 0, title.length, indexOfTitle) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  // highlight content
+
+                  var resultUpperBound = parseInt(1);
+                  var withoutUpperBound = false;
+                  if (resultUpperBound === -1) {
+                    withoutUpperBound = true;
+                  }
+                  var currentResultNum = 0;
+                  while (indexOfContent.length != 0 && (withoutUpperBound || (currentResultNum < resultUpperBound))) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                    "<p class=\"search-result\">" + highlightKeyword(content, start, end, indexOfContent) +
+                    "...</p>" + "</a>";
+                    currentResultNum++;
+                  }
+                  resultItem += "</li>";
+                  resultItems.push({item: resultItem, hitCount: hitCountInArticle, id: resultItems.length});
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.hitCount != resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultLeft.id - resultRight.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result, i) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              $resultContent.innerHTML = searchResultList;
+            }
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("WpQBIOFFVk2j3VShGdWrNzdx-gzGzoHsz", "N7O0UNa3oH14UGye19dyCBcm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

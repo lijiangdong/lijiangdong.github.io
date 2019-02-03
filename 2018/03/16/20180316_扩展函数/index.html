@@ -1,0 +1,1221 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Kotlin," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="综述和Java相比，在Kotlin中提供了不少新的特性。这次我们就来聊一聊Kotlin的一些通用的扩展函数run,with,let,also和apply。对于这五个扩展函数它们都存在于Kotlin的源码标准库当中，也就是在Standard.kt文件当中。它们都是适用于任何对象的通用扩展函数。但是对于run,with,let,also和apply这五个函数他们的用法及其相似，以至于我们无法确定去选择">
+<meta name="keywords" content="Kotlin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别">
+<meta property="og:url" content="http://lijiangdong.github.io/2018/03/16/20180316_扩展函数/index.html">
+<meta property="og:site_name" content="无嘴小呆子">
+<meta property="og:description" content="综述和Java相比，在Kotlin中提供了不少新的特性。这次我们就来聊一聊Kotlin的一些通用的扩展函数run,with,let,also和apply。对于这五个扩展函数它们都存在于Kotlin的源码标准库当中，也就是在Standard.kt文件当中。它们都是适用于任何对象的通用扩展函数。但是对于run,with,let,also和apply这五个函数他们的用法及其相似，以至于我们无法确定去选择">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://lijiangdong.github.io/images/20180316_01.jpg">
+<meta property="og:updated_time" content="2019-02-03T05:21:27.471Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别">
+<meta name="twitter:description" content="综述和Java相比，在Kotlin中提供了不少新的特性。这次我们就来聊一聊Kotlin的一些通用的扩展函数run,with,let,also和apply。对于这五个扩展函数它们都存在于Kotlin的源码标准库当中，也就是在Standard.kt文件当中。它们都是适用于任何对象的通用扩展函数。但是对于run,with,let,also和apply这五个函数他们的用法及其相似，以至于我们无法确定去选择">
+<meta name="twitter:image" content="http://lijiangdong.github.io/images/20180316_01.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://lijiangdong.github.io/2018/03/16/20180316_扩展函数/"/>
+
+
+
+
+
+  <title>聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别 | 无嘴小呆子</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?75a5108fa849298412266b0c02b04616";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无嘴小呆子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://lijiangdong.github.io/2018/03/16/20180316_扩展函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="李江东">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无嘴小呆子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T01:02:00+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/03/16/20180316_扩展函数/" class="leancloud_visitors" data-flag-title="聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="综述"><a href="#综述" class="headerlink" title="综述"></a><strong>综述</strong></h1><p>和Java相比，在Kotlin中提供了不少新的特性。这次我们就来聊一聊Kotlin的一些通用的扩展函数run,with,let,also和apply。对于这五个扩展函数它们都存在于Kotlin的源码标准库当中，也就是在Standard.kt文件当中。它们都是适用于任何对象的通用扩展函数。但是对于run,with,let,also和apply这五个函数他们的用法及其相似，以至于我们无法确定去选择使用哪一个。那么现在我们就来聊一下这五个函数它们的使用方法，它们的不同之处以及在什么场景下去使用。<a id="more"></a></p>
+<h1 id="作用域函数"><a href="#作用域函数" class="headerlink" title="作用域函数"></a><strong>作用域函数</strong></h1><p>在这里我们重点是看一下run,with,T.run,T.let,T.also,和T.apply，对于这几个函数来说它们最重要的功能之一是在调用函数的内部又提供了一个作用域。</p>
+<p>那么下面就通过一段代码来看一下run函数的作用域，对于其它函数来说当然也是类似。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">fun</span> <span class="title">test</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">var</span> animal = <span class="string">"cat"</span></div><div class="line">    run &#123;</div><div class="line">        <span class="keyword">val</span> animal = <span class="string">"dog"</span></div><div class="line">        println(animal)   <span class="comment">// dog</span></div><div class="line">    &#125;</div><div class="line">    println(animal)       <span class="comment">//cat</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这个简单的test函数当中我们拥有一个单独的作用域，在run函数中能够重新定义一个animal变量，并且它的作用域只存在于run函数当中。</p>
+<p>目前对于这个run函数看起来貌似没有什么用处，但是在run函数当中它不仅仅只是一个作用域，他还有一个返回值。他会返回在这个作用域当中的最后一个对象。</p>
+<p>例如现在有这么一个场景，用户领取app的奖励，如果用户没有登录弹出登录dialog，如果已经登录则弹出领取奖励的dialog。我们可以使用以下代码来处理这个逻辑。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">run &#123;</div><div class="line">    <span class="keyword">if</span> (islogin) loginDialog <span class="keyword">else</span> getAwardDialog</div><div class="line">&#125;.show()</div></pre></td></tr></table></figure>
+<p>可以看到上面这段代码会变得更加的简洁，并且可以将show方法一次应用到上面两个dialog当中，而不是去调用两次。</p>
+<h1 id="with和其它通用扩展函数"><a href="#with和其它通用扩展函数" class="headerlink" title="with和其它通用扩展函数"></a><strong>with和其它通用扩展函数</strong></h1><p>在这里之所以将with函数单独拿出来进行说明，是因为with得用法和其它通用的扩展函数的用法比较独特。在这里我们依然使用run函数来进行对比。对于下面这段代码做的是同样一件事。它们的不同之处就是一个使用了with(T)函数，而另一个则是使用了T.run函数。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">with(webView.settings)&#123;</div><div class="line">    javaScriptEnabled = <span class="literal">true</span></div><div class="line">    databaseEnabled = <span class="literal">true</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">webView.settings.run &#123; </div><div class="line">    javaScriptEnabled = <span class="literal">true</span></div><div class="line">    databaseEnabled = <span class="literal">true</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>但是我们觉得使用哪一个会更好呢？现在假设一种场景，那就是webView.settings可能为null。那我们就来再次看一下下面这段代码.</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">with(webView.settings)&#123;</div><div class="line">    javaScriptEnabled = <span class="literal">true</span></div><div class="line">    databaseEnabled = <span class="literal">true</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">webView.settings?.run &#123; </div><div class="line">    javaScriptEnabled = <span class="literal">true</span></div><div class="line">    databaseEnabled = <span class="literal">true</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这么以来就很明显了，当然是T.run方法会更好，因为我们可以在使用这些函数之前可以进行对null的检查。</p>
+<p>对于with也是存在一个返回值，它也是会返回在这个作用域当中的最后一个对象。</p>
+<h1 id="作用域中接收者this和it"><a href="#作用域中接收者this和it" class="headerlink" title="作用域中接收者this和it"></a><strong>作用域中接收者this和it</strong></h1><p>在这几个扩展函数当中，它们都能直接获取到调用的对象或者是with中传入参数的对象。在这五个扩展函数在它们的作用域中的接收者可以是this或者是it。那么我们来对比一下T.run和T.let函数。这两个函数也是十分的相似。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">stringVariable?.run &#123;</div><div class="line">    println(<span class="string">"字符串的长度为<span class="variable">$length</span>"</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line">stringVariable?.let &#123;</div><div class="line">    println(<span class="string">"字符串的长度为 <span class="subst">$&#123;it.length&#125;</span>"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这两段代码中可以清晰的看到。在T.run函数中通过this来获取stringVariable对象，而在T.let函数中通过it来取出stringVariable对象。当然我们也能够为it重新命名。如果我们不想覆盖外部作用域的this，这时候去使用T.let会更加的方便。至于哪些函数的接收者是this，哪些函数的接收者是it，在后面会通过一张树状图清晰的体现出来。</p>
+<h1 id="在作用域中返回值的类型"><a href="#在作用域中返回值的类型" class="headerlink" title="在作用域中返回值的类型"></a><strong>在作用域中返回值的类型</strong></h1><p>在这些作用域中它们都会存在一个返回值。在上面的讲述的run,with,T.run,T.let中它们返回的都是作用域中最后一个对象。当然它们所返回的值是允许和接受者it或者this对象的类型不同。但是并不是所有的扩展函数都是返回作用域的最后一个对象。例如T.also函数。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">val</span> original = <span class="string">"abc"</span></div><div class="line"></div><div class="line">original.let &#123;</div><div class="line">    println(<span class="string">"The original String is <span class="variable">$it</span>"</span>) <span class="comment">// "abc"</span></div><div class="line">    it.reversed() </div><div class="line">&#125;.let &#123;</div><div class="line">    println(<span class="string">"The reverse String is <span class="variable">$it</span>"</span>) <span class="comment">// "cba"</span></div><div class="line">    it.length  </div><div class="line">&#125;.let &#123;</div><div class="line">    println(<span class="string">"The length of the String is <span class="variable">$it</span>"</span>) <span class="comment">// 3</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">original.also &#123;</div><div class="line">    println(<span class="string">"The original String is <span class="variable">$it</span>"</span>) <span class="comment">// "abc"</span></div><div class="line">    it.reversed() </div><div class="line">&#125;.also &#123;</div><div class="line">    println(<span class="string">"The reverse String is <span class="subst">$&#123;it&#125;</span>"</span>) <span class="comment">// "abc"</span></div><div class="line">    it.length  </div><div class="line">&#125;.also &#123;</div><div class="line">    println(<span class="string">"The length of the String is <span class="subst">$&#123;it&#125;</span>"</span>) <span class="comment">// "abc"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从上面两段代码可以看出T.let和T.also的返回值使不同的。T.let返回的是作用域中的最后一个对象，它的值和类型都可以改变。但是T.also不管调用多少次返回的都是原来的original对象。</p>
+<p>对于T.let和T.also都能够进行链式操作，那么我们现在结合一下T.let和T.also的链式调用来看一下在实际场景中的应用。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//原始函数</span></div><div class="line"><span class="function"><span class="keyword">fun</span> <span class="title">makeDir</span><span class="params">(path: <span class="type">String</span>)</span></span>: File  &#123;</div><div class="line">    <span class="keyword">val</span> result = File(path)</div><div class="line">    result.mkdirs()</div><div class="line">    <span class="keyword">return</span> result</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//通过let和also的链式调用改进后的函数</span></div><div class="line"><span class="function"><span class="keyword">fun</span> <span class="title">makeDir</span><span class="params">(path: <span class="type">String</span>)</span></span> = path.let&#123; File(it) &#125;.also&#123; it.mkdirs() &#125;</div></pre></td></tr></table></figure>
+<h1 id="扩展函数的特性"><a href="#扩展函数的特性" class="headerlink" title="扩展函数的特性"></a><strong>扩展函数的特性</strong></h1><p>到目前为止除了T.apply没有使用到以外，根据上面的用法我们可以总结出来这些扩展函数的三大特性。</p>
+<ul>
+<li>它们都有自己的作用域</li>
+<li>它们作用域中的接收者是this或者it</li>
+<li>它们都有一个返回值，返回最后一个对象(this)或者调用者自身(itself)</li>
+</ul>
+<p>由此可想到对于T.apply无非也就是这三个特性。对于T.apply它作用域中的接收者是this，并且返回的调用者T。因此，T.apply的其中一个使用场景可以用来创建一个Fragment，代码如下所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// 使用普通的方法创建一个Fragment</span></div><div class="line"><span class="function"><span class="keyword">fun</span> <span class="title">createInstance</span><span class="params">(args: <span class="type">Bundle</span>)</span></span> : MyFragment &#123;</div><div class="line">    <span class="keyword">val</span> fragment = MyFragment()</div><div class="line">    fragment.arguments = args</div><div class="line">    <span class="keyword">return</span> fragment</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 通过apply来改善原有的方法创建一个Fragment</span></div><div class="line"><span class="function"><span class="keyword">fun</span> <span class="title">createInstance</span><span class="params">(args: <span class="type">Bundle</span>)</span></span> </div><div class="line">              = MyFragment().apply &#123; arguments = args &#125;</div></pre></td></tr></table></figure>
+<p>我们也能够通过T.apply的链式调用创建一个Intent：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// 普通创建Intent方法</div><div class="line">fun createIntent(intentData: String, intentAction: String): Intent &#123;</div><div class="line">    val intent = Intent()</div><div class="line">    intent.action = intentAction</div><div class="line">    intent.data=Uri.parse(intentData)</div><div class="line">    return intent</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 通过apply函数的链式调用创建Intent</div><div class="line">fun createIntent(intentData: String, intentAction: String) =</div><div class="line">        Intent().apply &#123; action = intentAction &#125;</div><div class="line">                .apply &#123; data = Uri.parse(intentData) &#125;</div></pre></td></tr></table></figure></p>
+<h1 id="如何选择使用"><a href="#如何选择使用" class="headerlink" title="如何选择使用"></a><strong>如何选择使用</strong></h1><p>在这里我们通过一个树状图来看一下对着五个扩展函数的区别，使用以及如何选取扩展函数（图片来源于参考文献当中）<br><img src="/images/20180316_01.jpg" alt="这里写图片描述"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h1><p>在这里做一下总结，我们可以看出在这五个扩展函数当中它们的特性也是十分的简单，无非也就是接收者和返回值的不同。对于with,T.run,T.apply接收者是this，而T.let和T.also接受者是it；对于with,T.run,T.let返回值是作用域的最后一个对象（this）,而T.apply和T.also返回值是调用者本身(itself)。</p>
+<h1 id="参考文献（需要科学上网）"><a href="#参考文献（需要科学上网）" class="headerlink" title="参考文献（需要科学上网）"></a>参考文献（需要科学上网）</h1><blockquote>
+<p><a href="https://android.jlelse.eu/mastering-kotlin-standard-functions-run-with-let-also-and-apply-9cd334b0ef84" target="_blank" rel="external">https://android.jlelse.eu/mastering-kotlin-standard-functions-run-with-let-also-and-apply-9cd334b0ef84</a></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kotlin/" rel="tag"># Kotlin</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/15/20170115_Monkey/" rel="next" title="Android稳定性测试工具Monkey的使用">
+                <i class="fa fa-chevron-left"></i> Android稳定性测试工具Monkey的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/24/20180324_kotlin添加Fragment/" rel="prev" title="使用Kotlin优雅的添加Fragment">
+                使用Kotlin优雅的添加Fragment <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yODM0MS80OTEz"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="李江东" />
+          <p class="site-author-name" itemprop="name">李江东</p>
+           
+              <p class="site-description motion-element" itemprop="description">用代码书写这个世界</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lijiangdong" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3257022505" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#综述"><span class="nav-number">1.</span> <span class="nav-text">综述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作用域函数"><span class="nav-number">2.</span> <span class="nav-text">作用域函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#with和其它通用扩展函数"><span class="nav-number">3.</span> <span class="nav-text">with和其它通用扩展函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#作用域中接收者this和it"><span class="nav-number">4.</span> <span class="nav-text">作用域中接收者this和it</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在作用域中返回值的类型"><span class="nav-number">5.</span> <span class="nav-text">在作用域中返回值的类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#扩展函数的特性"><span class="nav-number">6.</span> <span class="nav-text">扩展函数的特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何选择使用"><span class="nav-number">7.</span> <span class="nav-text">如何选择使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献（需要科学上网）"><span class="nav-number">9.</span> <span class="nav-text">参考文献（需要科学上网）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">李江东</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      $('#local-search-input').focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            var resultItems = [];
+            if (this.value.trim().length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCountInArticle = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCountInArticle = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  var resultItem = '';
+
+                  function highlightKeyword(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+
+                    var matchText = text.substring(start, end);
+                    var matchResult = [];
+                    var prevEnd = 0;
+                    while (position + word.length <= end && index.length != 0) {
+
+                      // highlight keyword
+
+                      var wordBegin = position - start;
+                      var wordEnd = position - start + word.length;
+                      matchResult.push(matchText.substring(prevEnd, wordBegin));
+                      matchResult.push("<b class=\"search-keyword\">" + matchText.substring(wordBegin, wordEnd) + "</b>");
+
+                      // move to next position of hit
+
+                      index.pop();
+                      prevEnd = wordEnd;
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (prevEnd > position - start) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    matchResult.push(matchText.substring(prevEnd));
+                    return matchResult.join('');
+                  }
+
+                  // sort index by position of keyword
+
+                  indexOfTitle.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  indexOfContent.sort(function (itemLeft, itemRight) {
+                    return itemRight.position - itemLeft.position;
+                  });
+
+                  // highlight title
+
+                  if (indexOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, 0, title.length, indexOfTitle) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  // highlight content
+
+                  var resultUpperBound = parseInt(1);
+                  var withoutUpperBound = false;
+                  if (resultUpperBound === -1) {
+                    withoutUpperBound = true;
+                  }
+                  var currentResultNum = 0;
+                  while (indexOfContent.length != 0 && (withoutUpperBound || (currentResultNum < resultUpperBound))) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                    "<p class=\"search-result\">" + highlightKeyword(content, start, end, indexOfContent) +
+                    "...</p>" + "</a>";
+                    currentResultNum++;
+                  }
+                  resultItem += "</li>";
+                  resultItems.push({item: resultItem, hitCount: hitCountInArticle, id: resultItems.length});
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              $resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.hitCount != resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultLeft.id - resultRight.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result, i) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              $resultContent.innerHTML = searchResultList;
+            }
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("WpQBIOFFVk2j3VShGdWrNzdx-gzGzoHsz", "N7O0UNa3oH14UGye19dyCBcm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
