@@ -69,8 +69,9 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repository: https://github.com/lijiangdong/lijiangdong.github.io.git
+  repository: git@github.com:lijiangdong/lijiangdong.github.io.git
   branch: master
+  message: hexo deploy
 
 search:
   path: search.xml
