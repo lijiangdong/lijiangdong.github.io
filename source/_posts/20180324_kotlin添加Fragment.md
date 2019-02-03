@@ -1,5 +1,5 @@
 ---
-title:  聊一聊Kotlin扩展函数run,with,let,also和apply的使用和区别
+title:  使用Kotlin优雅的添加Fragment
 date: 2018-03-24 18:47
 category: [Android]
 tags: [Kotlin]
